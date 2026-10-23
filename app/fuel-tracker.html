@@ -1,4 +1,4 @@
-<title>Fuel Ledger</title>
+<title>Fuel Tracker</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -163,7 +163,7 @@ a { color: var(--accent); }
 <div class="wrap">
   <header class="top">
     <div class="brand">
-      <h1>Fuel Ledger</h1>
+      <h1>Fuel Tracker</h1>
       <p>Meals × Strava × Withings<span id="goalNote"></span></p>
     </div>
     <div class="datebar">
@@ -298,7 +298,7 @@ a { color: var(--accent); }
 
   <section class="panel" aria-labelledby="h-nobody" id="noBodyPanel" hidden>
     <h2 id="h-nobody">Weight and body fat</h2>
-    <p class="muted" style="margin:0">Add a Withings tab to your sheet to see your weight trend and weekly fat mass here. Weight and body fat % are also used to calculate your base burn. <a href="https://github.com/hirokitnk/fuel-ledger/blob/main/docs/withings-ifttt.md" target="_blank" rel="noopener">How to fill it automatically with IFTTT</a></p>
+    <p class="muted" style="margin:0">Add a Withings tab to your sheet to see your weight trend and weekly fat mass here. Weight and body fat % are also used to calculate your base burn. <a href="https://github.com/hirokitnk/fuel-tracker/blob/main/docs/withings-ifttt.md" target="_blank" rel="noopener">How to fill it automatically with IFTTT</a></p>
   </section>
 
   <section class="panel" aria-labelledby="h-cfg">
@@ -1004,7 +1004,7 @@ const FuelCore = (() => {
   // ---------- boot ----------
   $("datePick").value = state.date;
   $("fDate").value = state.date;
-  $("sheetLink").href = CONFIGURED ? "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID + "/edit" : "https://github.com/hirokitnk/fuel-ledger#setup";
+  $("sheetLink").href = CONFIGURED ? "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID + "/edit" : "https://github.com/hirokitnk/fuel-tracker#setup";
   const hour = new Date().getHours();
   $("fKubun").value = hour < 10 ? "朝" : hour < 15 ? "昼" : hour < 17 ? "間食" : "夕";
   renderAll();

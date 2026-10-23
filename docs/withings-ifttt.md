@@ -1,10 +1,10 @@
 # Logging Withings weight to the sheet with IFTTT
 
-Every time you step on a Withings scale, IFTTT appends a row to a Google Sheet. Fuel Ledger reads it for your weight trend and base burn calculation.
+Every time you step on a Withings scale, IFTTT appends a row to a Google Sheet. Fuel Tracker reads it for your weight trend and base burn calculation.
 
 ## Before you start
 
-- **IFTTT writes to a separate file, not to your Fuel Ledger sheet.** IFTTT's "Add row to spreadsheet" action takes a file name and folder in Google Drive and appends to the first sheet of that file; it can't target a tab in an existing file. So you pull the data into a `Withings` tab in your Fuel Ledger sheet with `IMPORTRANGE` (step 4 below).
+- **IFTTT writes to a separate file, not to your Fuel Tracker sheet.** IFTTT's "Add row to spreadsheet" action takes a file name and folder in Google Drive and appends to the first sheet of that file; it can't target a tab in an existing file. So you pull the data into a `Withings` tab in your Fuel Tracker sheet with `IMPORTRANGE` (step 4 below).
 - On IFTTT's free plan, applets check hourly, so a weigh-in can take up to an hour to show up.
 - IFTTT starts a new file every 2,000 rows. That's over five years at one weigh-in a day, but when it happens, point step 4 at the new file.
 - **Check the date format and unit yourself once the first row arrives.** These steps are based on the fields the IFTTT Withings trigger provides (`DateAndTime`, `Weight`, `Unit`, `FatMass`, `FatMassPercent`, `LeanMass`), but the author hasn't verified the output in every environment.
@@ -20,13 +20,13 @@ Every time you step on a Withings scale, IFTTT appends a row to a Google Sheet. 
 
    Use a recognizable file name such as `withings-log`. The default folder (such as `IFTTT/Withings`) is fine.
 3. Step on the scale once and confirm that the file appears in Drive with a first row like `January 15, 2026 at 07:30AM | 65.2 | 18.5 | kg`.
-4. In your Fuel Ledger sheet, create a tab named `Withings` and put this in A1, replacing `<URL of the IFTTT file>` with the file from step 3. Click "Allow access" the first time.
+4. In your Fuel Tracker sheet, create a tab named `Withings` and put this in A1, replacing `<URL of the IFTTT file>` with the file from step 3. Click "Allow access" the first time.
 
    ```
    =IMPORTRANGE("<URL of the IFTTT file>", "A1:D")
    ```
 
-5. Tap ↻ on the Fuel Ledger page and the weight section appears.
+5. Tap ↻ on the Fuel Tracker page and the weight section appears.
 
 ## Troubleshooting
 

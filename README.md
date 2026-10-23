@@ -1,6 +1,6 @@
-# Fuel Ledger (燃料帳)
+# Fuel Tracker
 
-Fuel Ledger is a personal nutrition log for endurance athletes that runs as a private claude.ai Artifact. Snap a photo of your meal, Claude estimates calories and macros, and you append the result to your own Google Sheet. Strava activities and (optionally) Withings weigh-ins are combined into a daily energy balance, energy availability and a weight trend. It is designed to be used from Safari on an iPhone.
+Fuel Tracker is a personal nutrition log for endurance athletes that runs as a private claude.ai Artifact. Snap a photo of your meal, Claude estimates calories and macros, and you append the result to your own Google Sheet. Strava activities and (optionally) Withings weigh-ins are combined into a daily energy balance, energy availability and a weight trend. It is designed to be used from Safari on an iPhone.
 
 > The sheet's tab names (食事ログ, 設定) and the values written to it (meal types such as 朝, confidence 高/中/低) stay in Japanese for compatibility. Set `log_language` on the 設定 tab to choose whether Claude writes descriptions in English (`en`, the default) or Japanese (`ja`).
 
@@ -42,16 +42,16 @@ On claude.ai, go to **Settings → Connectors**, add **Google Sheets** and **Str
 1. Clone this repository.
 
    ```bash
-   git clone https://github.com/hirokitnk/fuel-ledger.git
+   git clone https://github.com/hirokitnk/fuel-tracker.git
    ```
 
 2. Install the skill (Claude Code).
 
    ```bash
-   mkdir -p ~/.claude/skills && cp -r fuel-ledger/skills/fuel-ledger-setup ~/.claude/skills/
+   mkdir -p ~/.claude/skills && cp -r fuel-tracker/skills/fuel-tracker-setup ~/.claude/skills/
    ```
 
-3. In Claude Code or the desktop app, open the cloned folder and say "Set up Fuel Ledger" (or 「燃料帳をセットアップして」). Claude asks for your sheet URL from step 1 and, if they are blank, your age, height and so on. At the end you get a link to your own private page.
+3. In Claude Code or the desktop app, open the cloned folder and say "Set up Fuel Tracker" (or 「Fuel Trackerをセットアップして」). Claude asks for your sheet URL from step 1 and, if they are blank, your age, height and so on. At the end you get a link to your own private page.
 
 ### 4. Open it in Safari on your iPhone and add it to the Home Screen
 
@@ -64,7 +64,7 @@ Day to day: tap **"＋ Log"** at the bottom → take a photo or pick one from yo
 ### Manual setup (without the skill)
 
 1. Do steps 1 and 2
-2. Copy `app/fuel-ledger.html` and replace `__SPREADSHEET_ID__` in `const SPREADSHEET_ID = "__SPREADSHEET_ID__";` near the top with your sheet's ID (the part of the URL between `/d/` and the next `/`)
+2. Copy `app/fuel-tracker.html` and replace `__SPREADSHEET_ID__` in `const SPREADSHEET_ID = "__SPREADSHEET_ID__";` near the top with your sheet's ID (the part of the URL between `/d/` and the next `/`)
 3. Fill in age, sex, height, weight and body fat % on the 設定 tab
 4. In Claude Code or the desktop app, ask Claude to "publish this HTML as an Artifact with these capabilities" and give it this declaration:
 
@@ -82,7 +82,7 @@ Day to day: tap **"＋ Log"** at the bottom → take a photo or pick one from yo
 
 ### Updating
 
-Run `git pull`, then ask Claude to "update Fuel Ledger". It republishes to the URL of the Artifact you published before, so **your link stays the same**.
+Run `git pull`, then ask Claude to "update Fuel Tracker". It republishes to the URL of the Artifact you published before, so **your link stays the same**.
 
 ## Adding Withings weight data
 
@@ -111,7 +111,7 @@ Details and sources: [docs/calculation-rules.md](docs/calculation-rules.md).
 
 ## Disclaimer
 
-- Fuel Ledger is **not a substitute for medical or nutritional advice.** If you have a medical condition, are pregnant, or have been told to restrict your diet, talk to a doctor or registered dietitian
+- Fuel Tracker is **not a substitute for medical or nutritional advice.** If you have a medical condition, are pregnant, or have been told to restrict your diet, talk to a doctor or registered dietitian
 - Estimates from photos **are approximate**, especially for restaurant food or dishes whose amounts are unclear. Treat low-confidence entries as rough guides
 - **Strava data is used only for calculations inside the page and is never sent to Claude** (per Strava's terms). Claude receives your meal photos and notes, your profile from the 設定 tab (age and so on), and your list of frequently eaten products
 

@@ -1,13 +1,13 @@
 ---
-name: fuel-ledger-setup
-description: Use when someone asks to set up or update Fuel Ledger (燃料帳), e.g. "Set up Fuel Ledger", "Update Fuel Ledger", 「燃料帳をセットアップして」; checks the connectors and the spreadsheet, fills in settings, and publishes the page as the user's own private claude.ai Artifact.
+name: fuel-tracker-setup
+description: Use when someone asks to set up or update Fuel Tracker, e.g. "Set up Fuel Tracker", "Update Fuel Tracker", 「Fuel Trackerをセットアップして」; checks the connectors and the spreadsheet, fills in settings, and publishes the page as the user's own private claude.ai Artifact.
 ---
 
-# Setting up Fuel Ledger
+# Setting up Fuel Tracker
 
-Fuel Ledger is a page where Claude estimates nutrition from meal photos and notes and logs it to a Google Sheet, and that shows a daily energy balance from Strava activities and Withings weight. Artifacts that use connectors can't be shared, so **each person has to publish their own copy**. This skill walks through that.
+Fuel Tracker is a page where Claude estimates nutrition from meal photos and notes and logs it to a Google Sheet, and that shows a daily energy balance from Strava activities and Withings weight. Artifacts that use connectors can't be shared, so **each person has to publish their own copy**. This skill walks through that.
 
-The page itself is `app/fuel-ledger.html` in the same repository as this skill. If it isn't available locally, get it from https://github.com/hirokitnk/fuel-ledger (`git clone`, or save `https://raw.githubusercontent.com/hirokitnk/fuel-ledger/main/app/fuel-ledger.html`).
+The page itself is `app/fuel-tracker.html` in the same repository as this skill. If it isn't available locally, get it from https://github.com/hirokitnk/fuel-tracker (`git clone`, or save `https://raw.githubusercontent.com/hirokitnk/fuel-tracker/main/app/fuel-tracker.html`).
 
 The page's on-screen text is English; the sheet's tab names and stored values stay Japanese. Talk to the user in whatever language they use, and ask whether they want Claude's estimates written in English or Japanese (`log_language` = `en` or `ja` on the 設定 tab).
 
@@ -35,7 +35,7 @@ Tell them the base burn that results from the calculation (Mifflin-St Jeor × ac
 
 ## 4. Publish the page
 
-1. Read `app/fuel-ledger.html` and write a copy to a working directory such as your scratchpad, with `__SPREADSHEET_ID__` in `const SPREADSHEET_ID = "__SPREADSHEET_ID__";` replaced by the ID from step 2. Don't modify the original in the repository. Keep the file name `fuel-ledger.html`.
+1. Read `app/fuel-tracker.html` and write a copy to a working directory such as your scratchpad, with `__SPREADSHEET_ID__` in `const SPREADSHEET_ID = "__SPREADSHEET_ID__";` replaced by the ID from step 2. Don't modify the original in the repository. Keep the file name `fuel-tracker.html`.
 2. Check that the tool names the page calls (`get_values`, `append_values`, `list_activities`) match this session's connector tool names. If they differ, change the page's `callTool(SHEETS, "...")` / `callTool(STRAVA, "...")` and the declaration below to match, and tell the user what you changed. Also check the argument names (`spreadsheetId`, `range`, `values`, `first`, `range_start`, `range_end`) against the tools' input schemas.
 3. Publish with the Artifact tool. On the first publish, pass `icon: "food"` and declare these capabilities:
 
@@ -61,4 +61,4 @@ Tell them the base burn that results from the calculation (Mifflin-St Jeor × ac
 
 ## 6. Updating
 
-When `app/fuel-ledger.html` in the repository changes, publish again as in step 4, **passing the URL of the previously published Artifact as `url`**. If you don't know the URL, find it with the Artifact tool's `action: "list"`. The link stays the same, so the Home Screen icon keeps working. If the capabilities haven't changed, you can omit `capabilities` (the previous declaration carries over).
+When `app/fuel-tracker.html` in the repository changes, publish again as in step 4, **passing the URL of the previously published Artifact as `url`**. If you don't know the URL, find it with the Artifact tool's `action: "list"`. The link stays the same, so the Home Screen icon keeps working. If the capabilities haven't changed, you can omit `capabilities` (the previous declaration carries over).

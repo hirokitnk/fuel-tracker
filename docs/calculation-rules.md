@@ -1,6 +1,6 @@
 # Calculation rules and rationale
 
-Fuel Ledger's numbers come from a simple model meant to give you a rough guide. They are not a substitute for medical or nutritional advice.
+Fuel Tracker's numbers come from a simple model meant to give you a rough guide. They are not a substitute for medical or nutritional advice.
 
 ## Daily balance
 
