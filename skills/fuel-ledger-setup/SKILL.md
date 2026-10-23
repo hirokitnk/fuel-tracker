@@ -9,7 +9,7 @@ Fuel Ledger is a page where Claude estimates nutrition from meal photos and note
 
 The page itself is `app/fuel-ledger.html` in the same repository as this skill. If it isn't available locally, get it from https://github.com/hirokitnk/fuel-ledger (`git clone`, or save `https://raw.githubusercontent.com/hirokitnk/fuel-ledger/main/app/fuel-ledger.html`).
 
-The page's on-screen text is Japanese. Talk to the user in whatever language they use.
+The page's on-screen text is English; the sheet's tab names and stored values stay Japanese. Talk to the user in whatever language they use, and ask whether they want Claude's estimates written in English or Japanese (`log_language` = `en` or `ja` on the 設定 tab).
 
 ## 1. Check prerequisites
 
@@ -57,7 +57,7 @@ Tell them the base burn that results from the calculation (Mifflin-St Jeor × ac
 - Open the published link in **Safari on the iPhone** and sign in to claude.ai. Connectors probably don't work inside the Claude iPhone app.
 - Tap Share → "Add to Home Screen" to open it like an app.
 - The first time, approve the prompts for Google Sheets, Strava and Claude.
-- Tap "＋ 記録" (Log) at the bottom, take a photo or pick one from the library, tap 推定する (Estimate), check the numbers, then tap スプレッドシートに記録 (Save to sheet).
+- Tap "＋ Log" at the bottom, take a photo or pick one from the library, tap Estimate, check the numbers, then tap Save to sheet.
 
 ## 6. Updating
 

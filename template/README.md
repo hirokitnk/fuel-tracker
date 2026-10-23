@@ -4,7 +4,7 @@ For people who build the sheet by hand instead of copying the template. Tab name
 
 ## 食事ログ tab (meal log, required)
 
-Row 1 is the header; data starts on row 2. The page reads `食事ログ!A2:H5000` and appends one row when you save.
+Row 1 is the header; data starts on row 2. The page shows meal types and confidence in English, but stores the Japanese values below. The page reads `食事ログ!A2:H5000` and appends one row when you save.
 
 | Column | Header | Contents |
 |---|---|---|
@@ -44,6 +44,7 @@ Keys in column A, values in column B, descriptions in column C. The page reads `
 | `withings_col_date` | A | A | Withings tab column holding the date/time |
 | `withings_col_weight` | B | B | Withings tab column holding the weight |
 | `withings_col_fat` | C | C | Withings tab column holding body fat % (blank if none) |
+| `log_language` | en | en | Language Claude writes estimates in (description, item names, comment): `en` or `ja` |
 
 ### Frequently eaten products (same tab, from column E)
 

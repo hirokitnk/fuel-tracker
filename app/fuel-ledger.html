@@ -1,4 +1,4 @@
-<title>燃料帳</title>
+<title>Fuel Ledger</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -163,14 +163,14 @@ a { color: var(--accent); }
 <div class="wrap">
   <header class="top">
     <div class="brand">
-      <h1>燃料帳</h1>
-      <p>食事ログ × Strava × Withings<span id="goalNote"></span></p>
+      <h1>Fuel Ledger</h1>
+      <p>Meals × Strava × Withings<span id="goalNote"></span></p>
     </div>
     <div class="datebar">
-      <button class="iconbtn" id="prevDay" aria-label="前の日">‹</button>
-      <input type="date" id="datePick" aria-label="日付">
-      <button class="iconbtn" id="nextDay" aria-label="次の日">›</button>
-      <button class="iconbtn" id="btnReload" aria-label="再読み込み">↻</button>
+      <button class="iconbtn" id="prevDay" aria-label="Previous day">‹</button>
+      <input type="date" id="datePick" aria-label="Date">
+      <button class="iconbtn" id="nextDay" aria-label="Next day">›</button>
+      <button class="iconbtn" id="btnReload" aria-label="Reload">↻</button>
     </div>
   </header>
 
@@ -178,62 +178,62 @@ a { color: var(--accent); }
 
   <section class="panel" aria-labelledby="h-day">
     <div class="sec-head">
-      <h2 id="h-day">この日の収支</h2>
-      <div class="seg" role="group" aria-label="勤務形態">
-        <button id="dtOffice" aria-pressed="true">出社</button>
-        <button id="dtHome" aria-pressed="false">在宅</button>
+      <h2 id="h-day">Today's balance</h2>
+      <div class="seg" role="group" aria-label="Day type">
+        <button id="dtOffice" aria-pressed="true">Office</button>
+        <button id="dtHome" aria-pressed="false">Home</button>
       </div>
     </div>
     <div class="ledger">
-      <div class="cell"><span class="lbl">摂取</span><span class="val" id="vIntake">—</span><span class="sub" id="sIntake">&nbsp;</span></div>
+      <div class="cell"><span class="lbl">Intake</span><span class="val" id="vIntake">—</span><span class="sub" id="sIntake">&nbsp;</span></div>
       <span class="op">−</span>
-      <div class="cell"><span class="lbl">消費</span><span class="val" id="vBurn">—</span><span class="sub" id="sBurn">&nbsp;</span></div>
+      <div class="cell"><span class="lbl">Burn</span><span class="val" id="vBurn">—</span><span class="sub" id="sBurn">&nbsp;</span></div>
       <span class="op">=</span>
-      <div class="cell result"><span class="lbl">収支</span><span class="val" id="vBal">—</span><span class="sub" id="sBal">&nbsp;</span></div>
+      <div class="cell result"><span class="lbl">Balance</span><span class="val" id="vBal">—</span><span class="sub" id="sBal">&nbsp;</span></div>
     </div>
     <div id="dayPills" class="actions"></div>
     <div class="meters" id="meters"></div>
-    <p class="remain" id="remain">記録を読み込んでいます。</p>
+    <p class="remain" id="remain">Loading your log…</p>
   </section>
 
   <section class="panel" aria-labelledby="h-meals">
     <div class="sec-head">
-      <h2 id="h-meals">食事ログ</h2>
+      <h2 id="h-meals">Meal log</h2>
       <span class="muted" id="mealsMeta"></span>
     </div>
     <div id="mealsStatus" class="status" hidden></div>
-    <div class="list" id="meals"><p class="empty">スプレッドシート「食事ログ」から、この日の記録を読み込みます。</p></div>
+    <div class="list" id="meals"><p class="empty">Loading this day's entries from the 食事ログ tab.</p></div>
   </section>
 
   <section class="panel" aria-labelledby="h-add">
     <div class="sec-head">
-      <h2 id="h-add">食事を記録</h2>
-      <span class="muted">写真とメモからClaudeが推定し、確認してから書き込みます</span>
+      <h2 id="h-add">Log a meal</h2>
+      <span class="muted">Claude estimates from your photos and note; you review before saving</span>
     </div>
     <div class="form">
       <div class="grid2">
         <div class="field">
-          <label for="fKubun">区分</label>
-          <select id="fKubun"><option>朝</option><option>昼</option><option>夕</option><option>間食</option><option>運動中</option></select>
+          <label for="fKubun">Meal</label>
+          <select id="fKubun"><option value="朝">Breakfast</option><option value="昼">Lunch</option><option value="夕">Dinner</option><option value="間食">Snack</option><option value="運動中">During exercise</option></select>
         </div>
         <div class="field">
-          <label for="fDate">日付</label>
+          <label for="fDate">Date</label>
           <input type="date" id="fDate">
         </div>
       </div>
       <div class="drop" id="drop">
-        <label for="fPhotos" class="muted" id="photoLabel">写真を撮るかライブラリから選ぶ（複数可）</label>
+        <label for="fPhotos" class="muted" id="photoLabel">Take a photo or choose from your library (several allowed)</label>
         <input type="file" id="fPhotos" accept="image/jpeg,image/png,image/webp,image/gif" multiple>
         <div class="thumbs" id="thumbs"></div>
       </div>
       <div class="field">
-        <label for="fMemo">メモ（量や中身。例：ご飯は130g、揚げ物は鶏ささみ）</label>
-        <textarea id="fMemo" placeholder="ご飯130g、納豆、豚汁"></textarea>
+        <label for="fMemo">Note (amounts and contents, e.g. "rice 130 g, the fried item is chicken breast")</label>
+        <textarea id="fMemo" placeholder="Rice 130 g, natto, miso soup"></textarea>
       </div>
       <div class="actions">
-        <button class="btn" id="btnEstimate">推定する</button>
-        <button class="btn ghost" id="btnStop" hidden>止める</button>
-        <button class="btn ghost" id="btnManual">手入力する</button>
+        <button class="btn" id="btnEstimate">Estimate</button>
+        <button class="btn ghost" id="btnStop" hidden>Stop</button>
+        <button class="btn ghost" id="btnManual">Enter manually</button>
         <span class="thinking" id="estStatus"></span>
       </div>
 
@@ -241,24 +241,24 @@ a { color: var(--accent); }
         <div class="tablewrap" id="estItemsWrap"></div>
         <div id="estComment" class="comment" hidden></div>
         <div class="field">
-          <label for="eContent">内容（C列に入ります）</label>
+          <label for="eContent">Description (goes in column C)</label>
           <textarea id="eContent"></textarea>
         </div>
         <div class="grid4">
           <div class="field"><label for="eKcal">kcal</label><input id="eKcal" type="number" inputmode="decimal" step="1"></div>
-          <div class="field"><label for="eP">たんぱく質 g</label><input id="eP" type="number" inputmode="decimal" step="0.1"></div>
-          <div class="field"><label for="eF">脂質 g</label><input id="eF" type="number" inputmode="decimal" step="0.1"></div>
-          <div class="field"><label for="eC">炭水化物 g</label><input id="eC" type="number" inputmode="decimal" step="0.1"></div>
+          <div class="field"><label for="eP">Protein g</label><input id="eP" type="number" inputmode="decimal" step="0.1"></div>
+          <div class="field"><label for="eF">Fat g</label><input id="eF" type="number" inputmode="decimal" step="0.1"></div>
+          <div class="field"><label for="eC">Carbs g</label><input id="eC" type="number" inputmode="decimal" step="0.1"></div>
         </div>
         <div class="grid2">
           <div class="field">
-            <label for="eConf">確度</label>
-            <select id="eConf"><option>高</option><option selected>中</option><option>低</option></select>
+            <label for="eConf">Confidence</label>
+            <select id="eConf"><option value="高">High</option><option value="中" selected>Medium</option><option value="低">Low</option></select>
           </div>
           <div class="field" style="justify-content:flex-end">
             <div class="actions">
-              <button class="btn" id="btnSave">スプレッドシートに記録</button>
-              <button class="btn ghost" id="btnDiscard">取り消す</button>
+              <button class="btn" id="btnSave">Save to sheet</button>
+              <button class="btn ghost" id="btnDiscard">Discard</button>
             </div>
           </div>
         </div>
@@ -269,55 +269,55 @@ a { color: var(--accent); }
 
   <section class="panel" aria-labelledby="h-acts">
     <div class="sec-head">
-      <h2 id="h-acts">運動（Strava）</h2>
-      <span class="muted">上乗せ＝安静時の分を差し引いた消費</span>
+      <h2 id="h-acts">Exercise (Strava)</h2>
+      <span class="muted">Extra = burn minus what you'd burn at rest</span>
     </div>
     <div id="actsStatus" class="status" hidden></div>
-    <div class="list" id="acts"><p class="empty">Stravaからこの日の活動を読み込みます。</p></div>
+    <div class="list" id="acts"><p class="empty">Loading this day's activities from Strava.</p></div>
   </section>
 
   <section class="panel" aria-labelledby="h-trend">
     <div class="sec-head">
-      <h2 id="h-trend">14日間の収支</h2>
+      <h2 id="h-trend">14-day balance</h2>
       <span class="muted" id="trendMeta"></span>
     </div>
-    <div class="legend"><span><i style="background:var(--good)"></i>赤字（減量側）</span><span><i style="background:var(--warn)"></i>黒字</span><span><i style="background:var(--ink-3)"></i><span id="trendLegend">目標線</span></span></div>
+    <div class="legend"><span><i style="background:var(--good)"></i>Deficit (losing)</span><span><i style="background:var(--warn)"></i>Surplus</span><span><i style="background:var(--ink-3)"></i><span id="trendLegend">Target line</span></span></div>
     <div class="chart" id="balChart"></div>
   </section>
 
   <section class="panel" aria-labelledby="h-body" id="bodyPanel" hidden>
     <div class="sec-head">
-      <h2 id="h-body">体重と体脂肪（Withings）</h2>
+      <h2 id="h-body">Weight and body fat (Withings)</h2>
       <span class="muted" id="bodyMeta"></span>
     </div>
     <div id="bodyStatus" class="status" hidden></div>
-    <div class="legend"><span><i style="background:var(--ink-3)"></i>毎朝の体重</span><span><i style="background:var(--accent)"></i>7日平均</span></div>
+    <div class="legend"><span><i style="background:var(--ink-3)"></i>Daily weight</span><span><i style="background:var(--accent)"></i>7-day average</span></div>
     <div class="chart" id="wChart"></div>
     <div class="tablewrap"><table class="weeks" id="weeks"></table></div>
   </section>
 
   <section class="panel" aria-labelledby="h-nobody" id="noBodyPanel" hidden>
-    <h2 id="h-nobody">体重と体脂肪</h2>
-    <p class="muted" style="margin:0">スプレッドシートに「Withings」タブを作ると、体重の推移と週ごとの体脂肪量がここに出ます。体重と体脂肪率は基本消費の計算にも使われます。<a href="https://github.com/hirokitnk/fuel-ledger/blob/main/docs/withings-ifttt.md" target="_blank" rel="noopener">IFTTTで自動で入れる手順</a></p>
+    <h2 id="h-nobody">Weight and body fat</h2>
+    <p class="muted" style="margin:0">Add a Withings tab to your sheet to see your weight trend and weekly fat mass here. Weight and body fat % are also used to calculate your base burn. <a href="https://github.com/hirokitnk/fuel-ledger/blob/main/docs/withings-ifttt.md" target="_blank" rel="noopener">How to fill it automatically with IFTTT</a></p>
   </section>
 
   <section class="panel" aria-labelledby="h-cfg">
     <div class="sec-head">
-      <h2 id="h-cfg">設定</h2>
-      <a class="linkbtn" id="sheetLink" href="#" target="_blank" rel="noopener">シートで編集する</a>
+      <h2 id="h-cfg">Settings</h2>
+      <a class="linkbtn" id="sheetLink" href="#" target="_blank" rel="noopener">Edit in the sheet</a>
     </div>
     <div id="cfgStatus" class="status" hidden></div>
     <dl class="cfg" id="cfgList"></dl>
-    <p class="muted" style="margin:0">値の変更はスプレッドシートの「設定」タブで行い、↻で読み込み直してください。</p>
+    <p class="muted" style="margin:0">Change values on the sheet's 設定 tab, then tap ↻ to reload.</p>
   </section>
 
   <details class="rules">
-    <summary>計算のルール</summary>
-    <p>基本消費＝基礎代謝（Mifflin-St Jeor式）×活動係数（出社・在宅）を100 kcal単位に丸めたもの。「設定」タブに基本消費を入れればそちらを優先します。運動の上乗せは、ラン＝Stravaの値×0.93、スイム＝泳いでいた時間×8.5 kcal/分（METs換算）、Zwift＝×0.8、自転車＝×0.6、筋トレ＝×0.7、その他＝×0.7。摂取目標は消費−赤字目標。エネルギー利用可能量（摂取−運動の上乗せ）は除脂肪量×係数を下限とします。たんぱく質・炭水化物は体重あたり、脂質は上限で見ます。炭水化物は上乗せ400 kcal以上の日に多めの目標を使います。ナッツは吸収率を考慮して成分表の値から約15%差し引きます。</p>
+    <summary>How it's calculated</summary>
+    <p>Base burn = basal metabolic rate (Mifflin-St Jeor) × activity factor (office or home), rounded to the nearest 100 kcal. A base burn entered on the 設定 tab takes priority. Exercise extra: run = Strava × 0.93, swim = minutes swimming × 8.5 kcal/min (from METs), Zwift = × 0.8, bike = × 0.6, strength = × 0.7, anything else = × 0.7. Intake target = burn − deficit target. Energy availability (intake − exercise extra) has a floor of fat-free mass × a factor. Protein and carbs are per kg of body weight; fat is a ceiling. Carbs use the higher target on days with ≥ 400 kcal of exercise extra. Nuts are estimated about 15% below food-table values to account for absorption.</p>
   </details>
 </div>
 
-<button class="fab" id="fab" type="button">＋ 記録</button>
+<button class="fab" id="fab" type="button">＋ Log</button>
 
 <script>
 // Pure calculation helpers (no DOM). Kept in their own script so they can be tested outside the page.
@@ -326,7 +326,7 @@ const FuelCore = (() => {
     age: 40, sex: "male", height_cm: 170, weight_kg: 65, body_fat_pct: 20,
     activity_office: 1.5, activity_home: 1.4, base_office_kcal: null, base_home_kcal: null,
     deficit_kcal: 300, protein_g_per_kg: [1.8, 2.0], fat_max_g: 70,
-    carb_g_per_kg_easy: 4, carb_g_per_kg_hard: 5, ea_kcal_per_kg_ffm: 30, goal_note: "",
+    carb_g_per_kg_easy: 4, carb_g_per_kg_hard: 5, ea_kcal_per_kg_ffm: 30, goal_note: "", log_language: "en",
     withings_col_date: "A", withings_col_weight: "B", withings_col_fat: "C",
   };
   const NUM_KEYS = ["age", "height_cm", "weight_kg", "body_fat_pct", "activity_office", "activity_home", "base_office_kcal", "base_home_kcal", "deficit_kcal", "fat_max_g", "carb_g_per_kg_easy", "carb_g_per_kg_hard", "ea_kcal_per_kg_ffm"];
@@ -408,16 +408,16 @@ const FuelCore = (() => {
   // body: optional {w, bf} from recent Withings averages, which override weight_kg / body_fat_pct.
   function targets(cfg, body) {
     const c = { ...cfg };
-    const src = { weight: "設定", bf: "設定" };
-    if (body && body.w) { c.weight_kg = body.w; src.weight = "Withings 7日平均"; }
-    if (body && body.bf) { c.body_fat_pct = body.bf; src.bf = "Withings 7日平均"; }
+    const src = { weight: "settings", bf: "settings" };
+    if (body && body.w) { c.weight_kg = body.w; src.weight = "Withings 7-day avg"; }
+    if (body && body.bf) { c.body_fat_pct = body.bf; src.bf = "Withings 7-day avg"; }
     const b = bmr(c);
     const auto = { office: Math.round(b * c.activity_office / 100) * 100, home: Math.round(b * c.activity_home / 100) * 100 };
     const base = { office: c.base_office_kcal || auto.office, home: c.base_home_kcal || auto.home };
     const ffm = c.weight_kg * (1 - c.body_fat_pct / 100);
     return {
       weight: c.weight_kg, bf: c.body_fat_pct, src, bmr: b, auto, base,
-      baseSrc: { office: c.base_office_kcal ? "設定で上書き" : "自動計算", home: c.base_home_kcal ? "設定で上書き" : "自動計算" },
+      baseSrc: { office: c.base_office_kcal ? "set in sheet" : "calculated", home: c.base_home_kcal ? "set in sheet" : "calculated" },
       ffm, eaFloor: Math.round(ffm * c.ea_kcal_per_kg_ffm / 10) * 10, deficit: c.deficit_kcal,
       protein: [Math.round(c.weight_kg * c.protein_g_per_kg[0]), Math.round(c.weight_kg * c.protein_g_per_kg[1])],
       fatMax: c.fat_max_g,
@@ -444,7 +444,7 @@ const FuelCore = (() => {
   const parseYmd = (s) => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
   const addDays = (s, n) => { const d = parseYmd(s); d.setDate(d.getDate() + n); return ymd(d); };
   const md = (s) => { const d = parseYmd(s); return (d.getMonth() + 1) + "/" + d.getDate(); };
-  const wd = (s) => "日月火水木金土"[parseYmd(s).getDay()];
+  const wd = (s) => ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][parseYmd(s).getDay()];
   const toNum = (v) => { const n = parseFloat(String(v ?? "").replace(/,/g, "")); return isNaN(n) ? 0 : n; };
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
@@ -485,7 +485,7 @@ const FuelCore = (() => {
     const s = a.summary || {};
     const kcal = toNum(s.total_calories);
     const t = a.sport_type || "";
-    if (t === "Swim") return { v: toNum(s.moving_time) / 60 * 8.5, rule: "泳いだ時間×8.5" };
+    if (t === "Swim") return { v: toNum(s.moving_time) / 60 * 8.5, rule: "min × 8.5" };
     if (t === "Run" || t === "TrailRun" || t === "VirtualRun") return { v: kcal * 0.93, rule: "×0.93" };
     if (t === "VirtualRide") return { v: kcal * 0.8, rule: "×0.8" };
     if (t === "Ride" || t === "EBikeRide") return { v: kcal * 0.6, rule: "×0.6" };
@@ -493,7 +493,10 @@ const FuelCore = (() => {
     return { v: kcal * 0.7, rule: "×0.7" };
   }
 
-  const SPORT_JA = { Run: "ラン", TrailRun: "トレイル", VirtualRun: "ラン（室内）", Swim: "スイム", Ride: "自転車", EBikeRide: "自転車", VirtualRide: "Zwift", WeightTraining: "筋トレ", Walk: "ウォーク", Hike: "ハイク", Workout: "ワークアウト" };
+  const SPORT_LABEL = { Run: "Run", TrailRun: "Trail run", VirtualRun: "Indoor run", Swim: "Swim", Ride: "Bike", EBikeRide: "E-bike", VirtualRide: "Zwift", WeightTraining: "Strength", Walk: "Walk", Hike: "Hike", Workout: "Workout" };
+  // Sheet values stay Japanese for compatibility; these are display labels only.
+  const MEAL_LABEL = { "朝": "Breakfast", "昼": "Lunch", "夕": "Dinner", "間食": "Snack", "運動中": "During exercise" };
+  const CONF_LABEL = { "高": "high", "中": "medium", "低": "low" };
 
   function mealsOn(date) {
     if (!state.meals) return [];
@@ -515,16 +518,16 @@ const FuelCore = (() => {
   function mcpCopy(e, server) {
     const code = e && e.code;
     switch (code) {
-      case "needs_reauth": return server + "の接続が切れています。claude.aiの設定 → コネクタで再接続してください。";
-      case "server_not_connected": return server + "が接続されていません。claude.aiの設定 → コネクタで追加してください。";
-      case "selection_required": return server + "の接続が複数あります。表示される画面でどれを使うか選んでください。";
-      case "not_in_manifest": return server + "の利用がこのページで許可されていません。ページのメニュー「権限」から許可できます。";
-      case "approval_required": return server + "の利用にはあなたの許可が必要です。";
-      case "blocked_by_policy": return "組織の設定により、" + server + "はこのページから使えません。";
-      case "server_unavailable": return server + "に一時的につながりません。少し待ってから再読み込みしてください。";
-      case "tool_error": return server + "がエラーを返しました：" + String(e.message || "").slice(0, 140);
-      case "not_granted": case "capability_disabled": case "capability_removed": return "このビューではコネクタを使えません。claude.aiでこのページを開いてください。";
-      default: return server + "を読み込めませんでした（" + (code || "不明") + "）。再読み込みしてください。";
+      case "needs_reauth": return "Your " + server + " connection has expired. Reconnect it under claude.ai Settings → Connectors.";
+      case "server_not_connected": return server + " isn't connected. Add it under claude.ai Settings → Connectors.";
+      case "selection_required": return "You have more than one " + server + " connection. Choose which one to use in the prompt.";
+      case "not_in_manifest": return "This page isn't allowed to use " + server + ". You can allow it from the page's Permissions menu.";
+      case "approval_required": return "Using " + server + " needs your permission.";
+      case "blocked_by_policy": return "Your organization's settings don't allow " + server + " on this page.";
+      case "server_unavailable": return "Can't reach " + server + " right now. Wait a moment and reload.";
+      case "tool_error": return server + " returned an error: " + String(e.message || "").slice(0, 140);
+      case "not_granted": case "capability_disabled": case "capability_removed": return "Connectors aren't available in this view. Open this page on claude.ai.";
+      default: return "Couldn't load " + server + " (" + (code || "unknown") + "). Please reload.";
     }
   }
   function showStatus(el, msg, isErr, retry) {
@@ -558,11 +561,11 @@ const FuelCore = (() => {
     try {
       state.settings = FuelCore.parseSettings(await getValues("設定!A1:J200"));
       state.settingsLoaded = true;
-      if (!state.settings.set.size) showStatus($("cfgStatus"), "「設定」タブに値がないため、既定値で計算しています。", false);
+      if (!state.settings.set.size) showStatus($("cfgStatus"), "The 設定 tab has no values, so defaults are being used.", false);
       else hideStatus($("cfgStatus"));
     } catch (e) {
       state.settings = FuelCore.parseSettings([]);
-      showStatus($("cfgStatus"), isMissingSheet(e) ? "「設定」タブがないため、既定値で計算しています。" : "設定を読めなかったため、既定値で計算しています。" + mcpCopy(e, SHEETS), false);
+      showStatus($("cfgStatus"), isMissingSheet(e) ? "There's no 設定 tab, so defaults are being used." : "Couldn't read settings, so defaults are being used. " + mcpCopy(e, SHEETS), false);
     }
   }
 
@@ -572,8 +575,8 @@ const FuelCore = (() => {
       state.meals = (await getValues("食事ログ!A2:H5000")).filter((r) => r && r[0]);
       hideStatus($("mealsStatus"));
     } catch (e) {
-      if (e && e.code === "approval_required") showStatus($("mealsStatus"), mcpCopy(e, SHEETS), true, { label: "許可する", fn: refreshAll });
-      else showStatus($("mealsStatus"), mcpCopy(e, SHEETS), true, (e && e.retryable) ? { label: "もう一度", fn: refreshAll } : null);
+      if (e && e.code === "approval_required") showStatus($("mealsStatus"), mcpCopy(e, SHEETS), true, { label: "Allow", fn: refreshAll });
+      else showStatus($("mealsStatus"), mcpCopy(e, SHEETS), true, (e && e.retryable) ? { label: "Try again", fn: refreshAll } : null);
     }
   }
 
@@ -604,7 +607,7 @@ const FuelCore = (() => {
       state.actsRange = [start, endDate];
       hideStatus($("actsStatus"));
     } catch (e) {
-      showStatus($("actsStatus"), mcpCopy(e, STRAVA), true, (e && (e.retryable || e.code === "approval_required")) ? { label: "もう一度", fn: refreshAll } : null);
+      showStatus($("actsStatus"), mcpCopy(e, STRAVA), true, (e && (e.retryable || e.code === "approval_required")) ? { label: "Try again", fn: refreshAll } : null);
     }
   }
 
@@ -612,12 +615,12 @@ const FuelCore = (() => {
   async function refreshAll() {
     if (loading || !state.mcp || !CONFIGURED) return;
     loading = true;
-    $("mealsMeta").textContent = "読み込み中…";
+    $("mealsMeta").textContent = "Loading…";
     await Promise.all([loadSettings(), loadMeals(), loadActs(state.date), loadWithings()]);
     // Withings columns can be remapped in 設定, so parse after both are in.
     state.body = state.withingsRows ? FuelCore.parseWithings(state.withingsRows, state.settings.cfg) : null;
     loading = false;
-    $("mealsMeta").textContent = "最終更新 " + new Date().toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" });
+    $("mealsMeta").textContent = "Updated " + new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
     renderAll();
   }
 
@@ -644,44 +647,44 @@ const FuelCore = (() => {
     $("dtHome").setAttribute("aria-pressed", String(c.type === "home"));
     const haveMeals = !!state.meals;
     $("vIntake").textContent = haveMeals ? fmt(c.intake.k) : "—";
-    $("sIntake").textContent = haveMeals ? c.rows.length + "件" : "未読込";
+    $("sIntake").textContent = haveMeals ? c.rows.length + (c.rows.length === 1 ? " entry" : " entries") : "not loaded";
     $("vBurn").textContent = fmt(c.burn);
-    $("sBurn").textContent = "基本" + fmt(t.base[c.type]) + " + 運動" + (c.actsKnown ? fmt(c.extra) : "?");
+    $("sBurn").textContent = "Base " + fmt(t.base[c.type]) + " + exercise " + (c.actsKnown ? fmt(c.extra) : "?");
     const balEl = $("vBal");
     balEl.textContent = haveMeals ? signed(c.bal) : "—";
     balEl.className = "val " + (!haveMeals ? "" : c.bal <= -t.deficit / 2 ? "good" : c.bal <= t.deficit / 2 ? "warn" : "bad");
-    $("sBal").textContent = "目標 −" + fmt(t.deficit) + "（摂取" + fmt(c.target) + "）";
+    $("sBal").textContent = "Target −" + fmt(t.deficit) + " (eat " + fmt(c.target) + ")";
 
     const pills = [];
     if (haveMeals && c.rows.length) {
       const eaTone = c.ea >= t.eaFloor ? "good" : c.ea >= t.eaFloor - 150 ? "warn" : "bad";
-      pills.push('<span class="pill ' + eaTone + '">利用可能量 ' + fmt(c.ea) + ' / 下限 ' + fmt(t.eaFloor) + '</span>');
+      pills.push('<span class="pill ' + eaTone + '">Energy avail. ' + fmt(c.ea) + ' / floor ' + fmt(t.eaFloor) + '</span>');
       const fatPct = c.intake.k > 0 ? c.intake.f * 9 / c.intake.k * 100 : 0;
-      pills.push('<span class="pill ' + (fatPct <= 30 ? "good" : fatPct <= 35 ? "warn" : "bad") + '">脂質比 ' + Math.round(fatPct) + '%</span>');
+      pills.push('<span class="pill ' + (fatPct <= 30 ? "good" : fatPct <= 35 ? "warn" : "bad") + '">Fat ' + Math.round(fatPct) + '% of kcal</span>');
     }
-    pills.push('<span class="pill">' + (c.type === "office" ? "出社日" : "在宅日") + '・' + md(state.date) + '（' + wd(state.date) + '）</span>');
+    pills.push('<span class="pill">' + (c.type === "office" ? "Office day" : "Home day") + ' · ' + wd(state.date) + ' ' + md(state.date) + '</span>');
     $("dayPills").innerHTML = pills.join("");
 
     const [pLo, pHi] = t.protein;
     $("meters").innerHTML = [
-      meter("エネルギー", c.intake.k, "kcal", { scale: Math.max(c.target * 1.25, c.intake.k), mark: c.target, targetText: fmt(c.target), tone: c.intake.k > c.target + 150 ? "bad" : c.ea < t.eaFloor && c.rows.length ? "warn" : "good" }),
-      meter("たんぱく質", c.intake.p, "g", { scale: Math.max(pHi * 1.2, c.intake.p), lo: pLo, hi: pHi, targetText: pLo + "〜" + pHi, tone: c.intake.p >= pLo ? "good" : "" }),
-      meter("脂質", c.intake.f, "g", { scale: Math.max(t.fatMax * 1.4, c.intake.f), mark: t.fatMax, targetText: "≤" + fmt(t.fatMax), tone: c.intake.f > t.fatMax ? "bad" : c.intake.f > t.fatMax * 0.8 ? "warn" : "good" }),
-      meter("炭水化物", c.intake.c, "g", { scale: Math.max(c.carbTarget * 1.3, c.intake.c), mark: c.carbTarget, targetText: String(c.carbTarget), tone: c.intake.c >= c.carbTarget ? "good" : "" }),
+      meter("Energy", c.intake.k, "kcal", { scale: Math.max(c.target * 1.25, c.intake.k), mark: c.target, targetText: fmt(c.target), tone: c.intake.k > c.target + 150 ? "bad" : c.ea < t.eaFloor && c.rows.length ? "warn" : "good" }),
+      meter("Protein", c.intake.p, "g", { scale: Math.max(pHi * 1.2, c.intake.p), lo: pLo, hi: pHi, targetText: pLo + "–" + pHi, tone: c.intake.p >= pLo ? "good" : "" }),
+      meter("Fat", c.intake.f, "g", { scale: Math.max(t.fatMax * 1.4, c.intake.f), mark: t.fatMax, targetText: "≤" + fmt(t.fatMax), tone: c.intake.f > t.fatMax ? "bad" : c.intake.f > t.fatMax * 0.8 ? "warn" : "good" }),
+      meter("Carbs", c.intake.c, "g", { scale: Math.max(c.carbTarget * 1.3, c.intake.c), mark: c.carbTarget, targetText: String(c.carbTarget), tone: c.intake.c >= c.carbTarget ? "good" : "" }),
     ].join("");
 
     const r = $("remain");
-    if (!haveMeals) { r.textContent = !CONFIGURED ? "スプレッドシートが設定されていません。" : state.mcp ? "食事ログを読み込んでいます。" : "このページはclaude.aiで開くと、スプレッドシートとStravaにつながります。"; return; }
+    if (!haveMeals) { r.textContent = !CONFIGURED ? "No spreadsheet is set up." : state.mcp ? "Loading your meal log…" : "Open this page on claude.ai to connect to your sheet and Strava."; return; }
     const leftK = c.target - c.intake.k;
     const leftP = Math.max(0, pLo - c.intake.p);
     const leftF = Math.max(0, t.fatMax - c.intake.f);
     const leftC = Math.max(0, c.carbTarget - c.intake.c);
     const minK = t.eaFloor + c.extra - c.intake.k;
     let html = leftK > 0
-      ? '残り <strong>' + fmt(leftK) + ' kcal</strong>（たんぱく質 ' + fmt(leftP) + ' g・炭水化物 ' + fmt(leftC) + ' g・脂質は ' + fmt(leftF) + ' g まで）。'
-      : '目標を <strong>' + fmt(-leftK) + ' kcal</strong> 超えています。今日はこれ以上は控えめに。';
-    if (minK > 0 && leftK > 0) html += ' 利用可能量の下限を守るには、最低でもあと <strong>' + fmt(minK) + ' kcal</strong>。';
-    if (!c.actsKnown) html += ' Stravaの記録は未取得です。';
+      ? '<strong>' + fmt(leftK) + ' kcal</strong> left (protein ' + fmt(leftP) + ' g, carbs ' + fmt(leftC) + ' g, fat up to ' + fmt(leftF) + ' g).'
+      : '<strong>' + fmt(-leftK) + ' kcal</strong> over target. Go easy for the rest of the day.';
+    if (minK > 0 && leftK > 0) html += ' To stay above your energy availability floor, eat at least <strong>' + fmt(minK) + ' kcal</strong> more.';
+    if (!c.actsKnown) html += ' Strava activities aren\'t loaded yet.';
     r.innerHTML = html;
   }
 
@@ -689,11 +692,11 @@ const FuelCore = (() => {
     const box = $("meals");
     if (!state.meals) return;
     const rows = mealsOn(state.date);
-    if (!rows.length) { box.innerHTML = '<p class="empty">' + md(state.date) + 'の記録はまだありません。下の「食事を記録」から追加できます。</p>'; return; }
+    if (!rows.length) { box.innerHTML = '<p class="empty">' + 'Nothing logged for ' + md(state.date) + ' yet. Add a meal with “Log a meal” below.</p>'; return; }
     box.innerHTML = rows.map((r) =>
-      '<div class="item"><span class="kubun">' + esc(r[1]) + '</span><span class="desc">' + esc(r[2]) + (r[7] ? '<span class="conf">' + esc(r[7]) + '</span>' : '') + '</span>' +
+      '<div class="item"><span class="kubun">' + esc(MEAL_LABEL[String(r[1]).trim()] || r[1]) + '</span><span class="desc">' + esc(r[2]) + (r[7] ? '<span class="conf">' + esc(CONF_LABEL[String(r[7]).trim()] || r[7]) + '</span>' : '') + '</span>' +
       '<span class="kcal">' + fmt(toNum(r[3])) + '</span>' +
-      '<span class="macro">P ' + fmt1(toNum(r[4])) + ' ・ F ' + fmt1(toNum(r[5])) + ' ・ C ' + fmt1(toNum(r[6])) + '</span></div>'
+      '<span class="macro">P ' + fmt1(toNum(r[4])) + ' · F ' + fmt1(toNum(r[5])) + ' · C ' + fmt1(toNum(r[6])) + '</span></div>'
     ).join("");
   }
 
@@ -701,34 +704,34 @@ const FuelCore = (() => {
     const box = $("acts");
     if (!state.actsRange) return;
     const c = calc(state.date);
-    if (!c.actsKnown) { box.innerHTML = '<p class="empty">この日はまだ読み込んでいません。</p>'; return; }
-    if (!c.acts.length) { box.innerHTML = '<p class="empty">この日の活動はありません。</p>'; return; }
+    if (!c.actsKnown) { box.innerHTML = '<p class="empty">This day isn\'t loaded yet.</p>'; return; }
+    if (!c.acts.length) { box.innerHTML = '<p class="empty">No activities on this day.</p>'; return; }
     box.innerHTML = c.acts.map((a) => {
       const s = a.summary || {};
       const adj = adjOf(a);
       const km = toNum(s.distance) / 1000;
       const min = toNum(s.moving_time) / 60;
-      let detail = (km > 0 ? fmt1(km) + " km・" : "") + Math.round(min) + "分";
-      if ((a.sport_type === "Run" || a.sport_type === "TrailRun") && km > 0) { const p = min / km; detail += "・" + Math.floor(p) + ":" + pad(Math.round((p % 1) * 60)) + "/km"; }
-      if (a.sport_type === "Swim" && km > 0) { const p = min / (km * 10); detail += "・" + Math.floor(p) + ":" + pad(Math.round((p % 1) * 60)) + "/100m"; }
+      let detail = (km > 0 ? fmt1(km) + " km · " : "") + Math.round(min) + " min";
+      if ((a.sport_type === "Run" || a.sport_type === "TrailRun") && km > 0) { const p = min / km; detail += " · " + Math.floor(p) + ":" + pad(Math.round((p % 1) * 60)) + "/km"; }
+      if (a.sport_type === "Swim" && km > 0) { const p = min / (km * 10); detail += " · " + Math.floor(p) + ":" + pad(Math.round((p % 1) * 60)) + "/100m"; }
       return '<div class="item"><span class="kubun">' + esc(String(a.start_local || "").slice(11, 16)) + '</span>' +
-        '<span class="desc">' + esc(SPORT_JA[a.sport_type] || a.sport_type) + '　' + esc(a.name || "") + '</span>' +
+        '<span class="desc">' + esc(SPORT_LABEL[a.sport_type] || a.sport_type) + '　' + esc(a.name || "") + '</span>' +
         '<span class="kcal">+' + fmt(adj.v) + '</span>' +
-        '<span class="macro">' + detail + '・Strava ' + fmt(toNum(s.total_calories)) + ' kcal（' + adj.rule + '）</span></div>';
-    }).join("") + '<div class="item"><span class="kubun">合計</span><span class="desc">運動の上乗せ</span><span class="kcal">+' + fmt(c.extra) + '</span></div>';
+        '<span class="macro">' + detail + ' · Strava ' + fmt(toNum(s.total_calories)) + ' kcal (' + adj.rule + ')</span></div>';
+    }).join("") + '<div class="item"><span class="kubun">Total</span><span class="desc">Exercise extra</span><span class="kcal">+' + fmt(c.extra) + '</span></div>';
   }
 
   function renderTrend() {
     const box = $("balChart");
     const deficit = T().deficit;
-    $("trendLegend").textContent = "−" + fmt(deficit) + " kcalの目標線";
-    if (!state.meals || !state.actsRange) { box.innerHTML = '<p class="empty">食事ログとStravaを読み込むと表示されます。</p>'; return; }
+    $("trendLegend").textContent = "−" + fmt(deficit) + " kcal target";
+    if (!state.meals || !state.actsRange) { box.innerHTML = '<p class="empty">Appears once your meal log and Strava are loaded.</p>'; return; }
     const days = [];
     for (let i = 13; i >= 0; i--) days.push(addDays(state.date, -i));
     const data = days.map((d) => { const c = calc(d); return { d, has: c.rows.length > 0 && c.actsKnown, bal: c.bal }; });
     const vals = data.filter((x) => x.has).map((x) => x.bal);
     const sum = vals.reduce((a, b) => a + b, 0);
-    $("trendMeta").textContent = vals.length ? vals.length + "日分の合計 " + signed(sum) + " kcal・平均 " + signed(sum / vals.length) + "/日" : "";
+    $("trendMeta").textContent = vals.length ? vals.length + "-day total " + signed(sum) + " kcal · avg " + signed(sum / vals.length) + "/day" : "";
     const W = 700, H = 230, L = 44, R = 8, T0 = 14, B = 30;
     const ext = Math.max(600, ...vals.map(Math.abs)) * 1.1;
     const y = (v) => T0 + (ext - v) / (2 * ext) * (H - T0 - B);
@@ -752,7 +755,7 @@ const FuelCore = (() => {
       }
       if (i % 2 === (days.length - 1) % 2) g += '<text x="' + cx + '" y="' + (H - 10) + '" text-anchor="middle"' + (x.d === state.date ? ' style="fill:var(--ink);font-weight:600"' : '') + '>' + md(x.d) + '</text>';
     });
-    box.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="14日間の日別収支">' + g + '</svg>';
+    box.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Daily balance over 14 days">' + g + '</svg>';
   }
 
   function renderBody() {
@@ -768,7 +771,7 @@ const FuelCore = (() => {
     for (let d = start; d <= end; d = addDays(d, 1)) days.push(d);
     const pts = days.map((d, i) => ({ d, i, w: byDay[d] ? byDay[d].w : null }));
     const withW = pts.filter((p) => p.w);
-    if (!withW.length) { box.innerHTML = '<p class="empty">この期間の計測がありません。</p>'; $("weeks").innerHTML = ""; $("bodyMeta").textContent = ""; return; }
+    if (!withW.length) { box.innerHTML = '<p class="empty">No weigh-ins in this period.</p>'; $("weeks").innerHTML = ""; $("bodyMeta").textContent = ""; return; }
     const avg = pts.map((p) => { const win = pts.slice(Math.max(0, p.i - 6), p.i + 1).filter((q) => q.w); return win.length >= 3 ? win.reduce((s, q) => s + q.w, 0) / win.length : null; });
     const ws = withW.map((p) => p.w);
     const lo = Math.floor(Math.min(...ws) - 0.3), hi = Math.ceil(Math.max(...ws) + 0.3);
@@ -784,8 +787,8 @@ const FuelCore = (() => {
     const lastAvgIdx = avg.map((v, i) => v != null ? i : -1).filter((i) => i >= 0).pop();
     if (lastAvgIdx != null) g += '<circle cx="' + x(lastAvgIdx) + '" cy="' + y(avg[lastAvgIdx]) + '" r="4.5" fill="var(--accent)" stroke="var(--paper)" stroke-width="2"/>';
     days.forEach((d, i) => { if (i % 7 === (days.length - 1) % 7) g += '<text x="' + x(i) + '" y="' + (H - 8) + '" text-anchor="middle">' + md(d) + '</text>'; });
-    box.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="体重の推移と7日平均">' + g + '</svg>';
-    $("bodyMeta").textContent = lastAvgIdx != null ? "7日平均 " + fmt1(avg[lastAvgIdx]) + " kg" : "";
+    box.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Weight trend and 7-day average">' + g + '</svg>';
+    $("bodyMeta").textContent = lastAvgIdx != null ? "7-day avg " + fmt1(avg[lastAvgIdx]) + " kg" : "";
 
     const weeks = [];
     for (let k = 0; k < 6; k++) {
@@ -797,7 +800,7 @@ const FuelCore = (() => {
       const abf = bfRows.length ? bfRows.reduce((s, r) => s + r.bf, 0) / bfRows.length : null;
       weeks.push({ label: md(wStart) + "〜" + md(wEnd), n: rows.length, aw, abf, fat: abf != null ? aw * abf / 100 : null });
     }
-    $("weeks").innerHTML = '<thead><tr><th>7日間</th><th>回数</th><th>平均体重</th><th>体脂肪率</th><th>体脂肪量</th></tr></thead><tbody>' +
+    $("weeks").innerHTML = '<thead><tr><th>7 days</th><th>Weigh-ins</th><th>Avg weight</th><th>Body fat</th><th>Fat mass</th></tr></thead><tbody>' +
       weeks.map((w) => '<tr><td>' + w.label + '</td><td>' + w.n + '</td><td>' + fmt1(w.aw) + ' kg</td><td>' + (w.abf != null ? fmt1(w.abf) + '%' : '—') + '</td><td>' + (w.fat != null ? fmt1(w.fat) + ' kg' : '—') + '</td></tr>').join("") + '</tbody>';
   }
 
@@ -806,17 +809,17 @@ const FuelCore = (() => {
     const c = state.settings.cfg;
     const src = (s) => '<span class="src">' + esc(s) + '</span>';
     const rows = [
-      ["体重", fmt1(t.weight) + " kg" + src(t.src.weight)],
-      ["体脂肪率", fmt1(t.bf) + "%" + src(t.src.bf)],
-      ["基礎代謝（Mifflin-St Jeor）", fmt(t.bmr) + " kcal"],
-      ["基本消費・出社日", fmt(t.base.office) + " kcal" + src(t.baseSrc.office)],
-      ["基本消費・在宅日", fmt(t.base.home) + " kcal" + src(t.baseSrc.home)],
-      ["1日の赤字目標", fmt(t.deficit) + " kcal"],
-      ["利用可能量の下限", fmt(t.eaFloor) + " kcal" + src("除脂肪量" + fmt1(t.ffm) + "kg×" + c.ea_kcal_per_kg_ffm)],
-      ["たんぱく質", t.protein[0] + "〜" + t.protein[1] + " g"],
-      ["脂質の上限", fmt(t.fatMax) + " g"],
-      ["炭水化物", t.carb.easy + " g" + src("上乗せ400kcal以上の日は" + t.carb.hard + " g")],
-      ["よく食べる市販品", state.settings.products.length + "品"],
+      ["Weight", fmt1(t.weight) + " kg" + src(t.src.weight)],
+      ["Body fat", fmt1(t.bf) + "%" + src(t.src.bf)],
+      ["BMR (Mifflin-St Jeor)", fmt(t.bmr) + " kcal"],
+      ["Base burn, office day", fmt(t.base.office) + " kcal" + src(t.baseSrc.office)],
+      ["Base burn, home day", fmt(t.base.home) + " kcal" + src(t.baseSrc.home)],
+      ["Daily deficit target", fmt(t.deficit) + " kcal"],
+      ["Energy availability floor", fmt(t.eaFloor) + " kcal" + src("fat-free mass " + fmt1(t.ffm) + " kg × " + c.ea_kcal_per_kg_ffm)],
+      ["Protein", t.protein[0] + "–" + t.protein[1] + " g"],
+      ["Fat ceiling", fmt(t.fatMax) + " g"],
+      ["Carbs", t.carb.easy + " g" + src(t.carb.hard + " g on days with 400+ kcal extra")],
+      ["Frequent products", String(state.settings.products.length)],
     ];
     $("cfgList").innerHTML = rows.map(([k, v]) => '<dt>' + esc(k) + '</dt><dd>' + v + '</dd>').join("");
   }
@@ -862,8 +865,8 @@ const FuelCore = (() => {
     state.files.forEach((f, i) => {
       const fig = document.createElement("figure");
       const img = document.createElement("img");
-      img.src = URL.createObjectURL(f); img.alt = "食事の写真 " + (i + 1);
-      const x = document.createElement("button"); x.textContent = "×"; x.setAttribute("aria-label", "写真を外す");
+      img.src = URL.createObjectURL(f); img.alt = "Meal photo " + (i + 1);
+      const x = document.createElement("button"); x.textContent = "×"; x.setAttribute("aria-label", "Remove photo");
       x.onclick = () => { state.files.splice(i, 1); renderThumbs(); };
       fig.append(img, x); box.append(fig);
     });
@@ -900,6 +903,7 @@ const FuelCore = (() => {
       "- メモに書かれた量（g・個数・品名）は写真より優先する。メモで写真の品目を訂正されたらメモに従う",
       "- 量や中身が分からないものは写真から推定し、何を想定したかを items の note に短く書く（例：約70gと想定）",
       productsText() || null,
+      state.settings.cfg.log_language === "ja" ? null : "- content、items の name と note、comment は英語で書く（confidence の値は「高」「中」「低」のまま）",
       "- ナッツは成分表の値から約15%差し引く（アーモンド単体なら20%）。実際に吸収されるエネルギーが少ないため。noteにその旨を書く",
       "- 確度: 品目と量がはっきりしていれば「高」、写真から量を推定したら「中」、外食などで中身や量がよく分からなければ「低」",
       "- content はスプレッドシートの1行に入る説明。品目と量を「、」でつなぐ（例：ご飯130g、納豆1パック、味噌汁（豆腐・わかめ））",
@@ -922,9 +926,9 @@ const FuelCore = (() => {
     $("eF").value = Math.round(t.f * 10) / 10;
     $("eC").value = Math.round(t.c * 10) / 10;
     $("eConf").value = ["高", "中", "低"].includes(est.confidence) ? est.confidence : "中";
-    $("estItemsWrap").innerHTML = lastItems.length ? '<table><thead><tr><th>品目</th><th>kcal</th><th>P</th><th>F</th><th>C</th></tr></thead><tbody>' +
+    $("estItemsWrap").innerHTML = lastItems.length ? '<table><thead><tr><th>Item</th><th>kcal</th><th>P</th><th>F</th><th>C</th></tr></thead><tbody>' +
       lastItems.map((it) => '<tr><td>' + esc(it.name) + (it.note ? '<span class="note">' + esc(it.note) + '</span>' : '') + '</td><td>' + fmt(it.kcal) + '</td><td>' + fmt1(it.protein) + '</td><td>' + fmt1(it.fat) + '</td><td>' + fmt1(it.carbs) + '</td></tr>').join("") +
-      '<tr><td><strong>合計</strong></td><td><strong>' + fmt(t.k) + '</strong></td><td>' + fmt1(t.p) + '</td><td>' + fmt1(t.f) + '</td><td>' + fmt1(t.c) + '</td></tr></tbody></table>' : "";
+      '<tr><td><strong>Total</strong></td><td><strong>' + fmt(t.k) + '</strong></td><td>' + fmt1(t.p) + '</td><td>' + fmt1(t.f) + '</td><td>' + fmt1(t.c) + '</td></tr></tbody></table>' : "";
     const cm = String(est.comment || "").trim();
     $("estComment").hidden = !cm; $("estComment").textContent = cm;
     $("est").hidden = false;
@@ -933,32 +937,32 @@ const FuelCore = (() => {
 
   function sampleCopy(e) {
     switch (e && e.code) {
-      case "not_granted": case "sampling_disabled": case "not_declared": case "capability_disabled": case "capability_removed": return "このビューではClaudeの推定を使えません。手入力で記録できます。";
-      case "rate_limited": return "使用量の上限に達しました。少し時間をおいてからもう一度押してください。";
-      case "image_rejected": return "この写真は読み込めませんでした。別の写真にするか、枚数を減らしてください。";
-      case "images_unavailable": return "このビューでは写真を送れません。メモだけで推定するか、手入力してください。";
-      case "invalid_json": return "推定結果をうまく読み取れませんでした。もう一度押してください。";
-      case "refused": return "この内容は推定できませんでした。メモを変えて試してください。";
-      case "session_expired": return "claude.aiに再度サインインしてください。";
-      case "cancelled": return "止めました。";
-      default: return "推定できませんでした。もう一度押してください。";
+      case "not_granted": case "sampling_disabled": case "not_declared": case "capability_disabled": case "capability_removed": return "Claude estimates aren't available in this view. You can enter values manually.";
+      case "rate_limited": return "You've hit your usage limit. Wait a while and try again.";
+      case "image_rejected": return "Couldn't read this photo. Try a different one or fewer photos.";
+      case "images_unavailable": return "Photos can't be sent from this view. Estimate from the note only, or enter values manually.";
+      case "invalid_json": return "Couldn't read the estimate. Please try again.";
+      case "refused": return "This couldn't be estimated. Try changing the note.";
+      case "session_expired": return "Please sign in to claude.ai again.";
+      case "cancelled": return "Stopped.";
+      default: return "Couldn't estimate. Please try again.";
     }
   }
 
   $("btnEstimate").onclick = async () => {
     const memo = $("fMemo").value.trim();
-    if (!state.sample) { $("estStatus").textContent = "このビューではClaudeの推定を使えません。「手入力する」から記録できます。"; return; }
-    if (!state.files.length && !memo) { $("estStatus").textContent = "写真かメモのどちらかを入れてください。"; return; }
+    if (!state.sample) { $("estStatus").textContent = "Claude estimates aren't available in this view. Use “Enter manually” to log."; return; }
+    if (!state.files.length && !memo) { $("estStatus").textContent = "Add a photo or a note."; return; }
     const useImages = state.canImages && state.files.length > 0;
     ctl = new AbortController();
     $("btnEstimate").disabled = true; $("btnStop").hidden = false;
-    $("estStatus").textContent = "Claudeが推定しています…（写真ありだと30秒ほど）";
+    $("estStatus").textContent = "Claude is estimating… (about 30 seconds with photos)";
     try {
       const opts = { signal: ctl.signal, cache: false };
       if (useImages) opts.images = state.files.slice();
       const est = await state.sample.json(promptFor($("fKubun").value, $("fDate").value || state.date, memo, useImages), opts);
       fillEstimate(est || {});
-      $("estStatus").textContent = "内容を確認して、必要なら数字を直してから記録してください。";
+      $("estStatus").textContent = "Check the result, fix any numbers, then save.";
     } catch (e) {
       $("estStatus").textContent = sampleCopy(e);
     } finally {
@@ -974,14 +978,14 @@ const FuelCore = (() => {
     if (saving) return;
     const content = $("eContent").value.trim();
     const date = $("fDate").value || state.date;
-    if (!content) { $("saveStatus").textContent = "内容を入れてください。"; return; }
-    if ($("eKcal").value === "") { $("saveStatus").textContent = "kcalを入れてください。"; return; }
-    if (!state.mcp || !CONFIGURED) { $("saveStatus").textContent = "このビューではスプレッドシートに書き込めません。"; return; }
+    if (!content) { $("saveStatus").textContent = "Enter a description."; return; }
+    if ($("eKcal").value === "") { $("saveStatus").textContent = "Enter kcal."; return; }
+    if (!state.mcp || !CONFIGURED) { $("saveStatus").textContent = "Can't write to the sheet from this view."; return; }
     const row = [date, $("fKubun").value, content, toNum($("eKcal").value), toNum($("eP").value), toNum($("eF").value), toNum($("eC").value), $("eConf").value];
-    saving = true; $("btnSave").disabled = true; $("saveStatus").textContent = "書き込んでいます…";
+    saving = true; $("btnSave").disabled = true; $("saveStatus").textContent = "Saving…";
     try {
       await state.mcp.callTool(SHEETS, "append_values", { spreadsheetId: SPREADSHEET_ID, range: "食事ログ!A1", values: [row] }, { cache: false });
-      $("saveStatus").textContent = "記録しました。";
+      $("saveStatus").textContent = "Saved.";
       $("est").hidden = true; $("fMemo").value = ""; state.files = []; renderThumbs(); $("estStatus").textContent = "";
       if (date !== state.date) setDate(date);
       await loadMeals(); renderAll();
@@ -989,7 +993,7 @@ const FuelCore = (() => {
       // An ambiguous failure may have written the row: reload and let the person decide, never resend automatically.
       const ambiguous = e && (e.code === "server_unavailable" || e.code === "upstream_error" || e.code === "cancelled");
       $("saveStatus").textContent = ambiguous
-        ? "書き込めたか確認できませんでした。食事ログを再読み込みして、記録がなければもう一度押してください。"
+        ? "Couldn't confirm the save. The meal log has been reloaded; if the entry isn't there, save again."
         : mcpCopy(e, SHEETS);
       if (ambiguous) { await loadMeals(); renderAll(); }
     } finally {
@@ -1000,30 +1004,30 @@ const FuelCore = (() => {
   // ---------- boot ----------
   $("datePick").value = state.date;
   $("fDate").value = state.date;
-  $("sheetLink").href = CONFIGURED ? "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID + "/edit" : "https://github.com/hirokitnk/fuel-ledger#セットアップ";
+  $("sheetLink").href = CONFIGURED ? "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID + "/edit" : "https://github.com/hirokitnk/fuel-ledger#setup";
   const hour = new Date().getHours();
   $("fKubun").value = hour < 10 ? "朝" : hour < 15 ? "昼" : hour < 17 ? "間食" : "夕";
   renderAll();
 
   if (!CONFIGURED) {
-    showStatus($("pageStatus"), "スプレッドシートが設定されていません。セットアップ用スキルで公開するか、ファイル先頭の SPREADSHEET_ID を自分のシートのIDに置き換えてください。", true);
+    showStatus($("pageStatus"), "No spreadsheet is set up. Publish with the setup skill, or replace SPREADSHEET_ID at the top of the file with your sheet's ID.", true);
   }
   if (window.claude && typeof window.claude.use === "function") {
     window.claude.use("sample").then(async (s) => {
       state.sample = s;
-      if (!s) { $("btnEstimate").disabled = true; $("estStatus").textContent = "このビューではClaudeの推定を使えません。「手入力する」から記録できます。"; return; }
+      if (!s) { $("btnEstimate").disabled = true; $("estStatus").textContent = "Claude estimates aren't available in this view. Use “Enter manually” to log."; return; }
       const lim = await s.limits().catch(() => null);
       state.canImages = !!(lim && lim.images);
-      if (!state.canImages) $("photoLabel").textContent = "このビューでは写真を送れません。メモだけで推定できます。";
+      if (!state.canImages) $("photoLabel").textContent = "Photos can't be sent from this view. You can still estimate from the note.";
       else $("fPhotos").accept = lim.images.mediaTypes.join(",");
     });
     window.claude.use("mcp").then((m) => {
       state.mcp = m;
-      if (!m) { showStatus($("pageStatus"), "このビューではスプレッドシートとStravaにつながりません。claude.aiでこのページを開いてください。", true); renderAll(); return; }
+      if (!m) { showStatus($("pageStatus"), "This view can't connect to your sheet and Strava. Open this page on claude.ai.", true); renderAll(); return; }
       refreshAll();
     });
   } else {
-    if (CONFIGURED) showStatus($("pageStatus"), "このページはclaude.aiで開くと、スプレッドシートとStravaにつながります。", true);
+    if (CONFIGURED) showStatus($("pageStatus"), "Open this page on claude.ai to connect to your sheet and Strava.", true);
     $("btnEstimate").disabled = true;
   }
 })();

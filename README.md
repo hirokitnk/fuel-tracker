@@ -2,7 +2,7 @@
 
 Fuel Ledger is a personal nutrition log for endurance athletes that runs as a private claude.ai Artifact. Snap a photo of your meal, Claude estimates calories and macros, and you append the result to your own Google Sheet. Strava activities and (optionally) Withings weigh-ins are combined into a daily energy balance, energy availability and a weight trend. It is designed to be used from Safari on an iPhone.
 
-> The app's on-screen text is in Japanese. Documentation is in English.
+> The sheet's tab names (食事ログ, 設定) and the values written to it (meal types such as 朝, confidence 高/中/低) stay in Japanese for compatibility. Set `log_language` on the 設定 tab to choose whether Claude writes descriptions in English (`en`, the default) or Japanese (`ja`).
 
 ## What it does
 
@@ -59,7 +59,7 @@ On claude.ai, go to **Settings → Connectors**, add **Google Sheets** and **Str
 2. Tap Share → **Add to Home Screen**
 3. The first time, approve the prompts that let the page use Google Sheets, Strava and Claude
 
-Day to day: tap **"＋ 記録"** (Log) at the bottom → take a photo or pick one from your library → add a note on amounts (e.g. "rice 130 g, the fried item is chicken breast") → **推定する** (Estimate) → check the numbers → **スプレッドシートに記録** (Save to sheet).
+Day to day: tap **"＋ Log"** at the bottom → take a photo or pick one from your library → add a note on amounts (e.g. "rice 130 g, the fried item is chicken breast") → **Estimate** → check the numbers → **Save to sheet**.
 
 ### Manual setup (without the skill)
 
@@ -112,7 +112,7 @@ Details and sources: [docs/calculation-rules.md](docs/calculation-rules.md).
 ## Disclaimer
 
 - Fuel Ledger is **not a substitute for medical or nutritional advice.** If you have a medical condition, are pregnant, or have been told to restrict your diet, talk to a doctor or registered dietitian
-- Estimates from photos **are approximate**, especially for restaurant food or dishes whose amounts are unclear. Treat entries marked 低 (low confidence) as rough guides
+- Estimates from photos **are approximate**, especially for restaurant food or dishes whose amounts are unclear. Treat low-confidence entries as rough guides
 - **Strava data is used only for calculations inside the page and is never sent to Claude** (per Strava's terms). Claude receives your meal photos and notes, your profile from the 設定 tab (age and so on), and your list of frequently eaten products
 
 ## License
