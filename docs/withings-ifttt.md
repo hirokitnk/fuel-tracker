@@ -1,39 +1,39 @@
-# IFTTTでWithingsの体重をシートに入れる
+# Logging Withings weight to the sheet with IFTTT
 
-Withingsの体重計で測るたびに、IFTTTが体重をGoogleスプレッドシートに1行ずつ書き込むようにします。燃料帳はそれを読んで、体重の推移と基本消費の計算に使います。
+Every time you step on a Withings scale, IFTTT appends a row to a Google Sheet. Fuel Ledger reads it for your weight trend and base burn calculation.
 
-## 先に知っておくこと
+## Before you start
 
-- **IFTTTが書き込むのは、燃料帳のシートとは別のファイルです。** IFTTTの「Add row to spreadsheet」は、Googleドライブ上のファイル名とフォルダを指定して、そのファイルの最初のシートに行を足します。既存のファイルの特定のタブには書けません。そこで、燃料帳のシートの「Withings」タブから `IMPORTRANGE` で読み込みます（下の手順4）。
-- IFTTTの無料プランでは、確認が1時間おきです。測ってからページに出るまで最大1時間ほどかかります。
-- IFTTTは2,000行ごとに新しいファイルを作ります。毎日1回測るなら5年以上もちますが、新しいファイルができたら手順4の参照先を変えてください。
-- 実際の日付の書式と単位は、**最初の1行が書き込まれたら必ず目で確かめてください。** この手順は、IFTTTのWithingsトリガーが出す項目（`DateAndTime`、`Weight`、`Unit`、`FatMass`、`FatMassPercent`、`LeanMass`）にもとづいていますが、作者は出力をすべての環境で確かめたわけではありません。
+- **IFTTT writes to a separate file, not to your Fuel Ledger sheet.** IFTTT's "Add row to spreadsheet" action takes a file name and folder in Google Drive and appends to the first sheet of that file; it can't target a tab in an existing file. So you pull the data into a `Withings` tab in your Fuel Ledger sheet with `IMPORTRANGE` (step 4 below).
+- On IFTTT's free plan, applets check hourly, so a weigh-in can take up to an hour to show up.
+- IFTTT starts a new file every 2,000 rows. That's over five years at one weigh-in a day, but when it happens, point step 4 at the new file.
+- **Check the date format and unit yourself once the first row arrives.** These steps are based on the fields the IFTTT Withings trigger provides (`DateAndTime`, `Weight`, `Unit`, `FatMass`, `FatMassPercent`, `LeanMass`), but the author hasn't verified the output in every environment.
 
-## 手順
+## Steps
 
-1. IFTTTで新しいアプレットを作ります。If This＝**Withings → New weight measurement**、Then That＝**Google Sheets → Add row to spreadsheet**。
-2. 「Formatted row」を次のようにします（列の並びがA＝日時、B＝体重、C＝体脂肪率、D＝単位になります）。
+1. Create a new IFTTT applet. If This = **Withings → New weight measurement**, Then That = **Google Sheets → Add row to spreadsheet**.
+2. Set "Formatted row" to the following, so the columns are A = date/time, B = weight, C = body fat %, D = unit:
 
    ```
    {{DateAndTime}} ||| {{Weight}} ||| {{FatMassPercent}} ||| {{Unit}}
    ```
 
-   ファイル名は `withings-log` など分かりやすいものに、フォルダは `IFTTT/Withings` など既定のままで構いません。
-3. 一度体重計に乗って、ドライブにファイルができ、1行目に `January 15, 2026 at 07:30AM | 65.2 | 18.5 | kg` のような行が入ることを確かめます。
-4. 燃料帳のシートに「Withings」タブを作り、A1に次の式を入れます（`<IFTTTのファイルのURL>` は手順3のファイルのURL）。初回は「アクセスを許可」を押します。
+   Use a recognizable file name such as `withings-log`. The default folder (such as `IFTTT/Withings`) is fine.
+3. Step on the scale once and confirm that the file appears in Drive with a first row like `January 15, 2026 at 07:30AM | 65.2 | 18.5 | kg`.
+4. In your Fuel Ledger sheet, create a tab named `Withings` and put this in A1, replacing `<URL of the IFTTT file>` with the file from step 3. Click "Allow access" the first time.
 
    ```
-   =IMPORTRANGE("<IFTTTのファイルのURL>", "A1:D")
+   =IMPORTRANGE("<URL of the IFTTT file>", "A1:D")
    ```
 
-5. 燃料帳のページで ↻ を押すと、体重の欄が出ます。
+5. Tap ↻ on the Fuel Ledger page and the weight section appears.
 
-## うまく読めないとき
+## Troubleshooting
 
-- **列の並びを変えた**：「設定」タブに `withings_col_date`、`withings_col_weight`、`withings_col_fat` を追加して、列の文字（A、Bなど）を書きます。体脂肪率がなければ `withings_col_fat` を空欄に。
-- **単位がlbになっている**：行に `lbs` と書かれていれば自動でkgに換算します。単位の列を入れていない場合は、Withingsのアプリで単位をkgにしてください。
-- **日付が読めない**：読めるのは `2026-01-15 …`、`2026/01/15 …`、`January 15, 2026 at …` の形です。ほかの形なら、IMPORTRANGEの代わりに `=ARRAYFORMULA(...)` などで `YYYY-MM-DD` に直した列を作り、`withings_col_date` でそちらを指定してください。
+- **You changed the column order**: add `withings_col_date`, `withings_col_weight` and `withings_col_fat` to the 設定 tab with the column letters (A, B, …). Leave `withings_col_fat` blank if you have no body fat column.
+- **Weights are in pounds**: rows that contain `lbs` are converted to kg automatically. If you didn't include the unit column, switch the Withings app to kg.
+- **Dates aren't recognized**: the page reads `2026-01-15 …`, `2026/01/15 …` and `January 15, 2026 at …`. For anything else, build a column that converts the dates to `YYYY-MM-DD` (for example with `=ARRAYFORMULA(...)` instead of a plain IMPORTRANGE) and point `withings_col_date` at it.
 
-## すでにApps ScriptでWithingsのAPIから書き込んでいる場合
+## If you already write to the sheet from the Withings API with Apps Script
 
-A＝日時（`2026-01-15 07:30`）、B＝体重(kg)、C＝体脂肪率(%) の形なら、そのまま「Withings」タブとして読めます。
+If your rows look like A = date/time (`2026-01-15 07:30`), B = weight (kg), C = body fat (%), they work as a `Withings` tab as they are.

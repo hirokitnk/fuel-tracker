@@ -1,65 +1,65 @@
-# 計算のルールと根拠
+# Calculation rules and rationale
 
-燃料帳の数字は、目安を出すための簡単なモデルです。医療や栄養指導の代わりにはなりません。
+Fuel Ledger's numbers come from a simple model meant to give you a rough guide. They are not a substitute for medical or nutritional advice.
 
-## 1日の収支
-
-```
-収支 = 摂取 − 消費
-消費 = 基本消費（出社日／在宅日） + 運動の上乗せ
-摂取目標 = 消費 − 赤字目標（deficit_kcal、既定300 kcal）
-```
-
-収支の色は、赤字目標の半分より赤字なら緑、±半分の範囲なら黄、それより黒字なら赤です。
-
-## 基本消費
-
-運動以外の1日の消費（基礎代謝＋日常の活動＋食事による産熱）です。
+## Daily balance
 
 ```
-基礎代謝 = 10×体重(kg) + 6.25×身長(cm) − 5×年齢 + 5   （男性）
-基礎代謝 = 10×体重(kg) + 6.25×身長(cm) − 5×年齢 − 161 （女性）
-基本消費 = 基礎代謝 × 活動係数   （100 kcal単位に丸める）
+Balance       = Intake − Burn
+Burn          = Base burn (office day / home day) + Exercise extra
+Intake target = Burn − Daily deficit (deficit_kcal, 300 kcal by default)
 ```
 
-- 基礎代謝の式は **Mifflin-St Jeor式**（Mifflin et al., 1990）。健康な成人で実測に近いとされ、米国栄養士会（Academy of Nutrition and Dietetics）の評価でも推奨されている式です。
-- 活動係数は、出社日1.5、在宅日1.4を既定にしています。通勤で歩く日と、ほとんど座っている日の差です。運動はStravaから別に足すので、ここには入れません。
-- 例：45歳男性・175cm・70kg → 基礎代謝1,573.75 kcal → 出社日2,400 kcal、在宅日2,200 kcal。
-- 体重と体脂肪率は、「Withings」タブがあれば直近7日の平均を使います。
-- 自分の実感や実測（体重の推移）と合わなければ、「設定」タブの `base_office_kcal`／`base_home_kcal` に数字を入れて上書きしてください。2〜3週間、収支の合計と体重の7日平均の変化（脂肪1 kg ≒ 7,200 kcal）を比べると調整の目安になります。
+The balance turns green when the deficit is more than half your target, yellow within ± half, and red above that.
 
-## 運動の上乗せ（ページに固定）
+## Base burn
 
-Stravaの消費カロリーには、運動していなくても使っていた分（安静時の消費）が含まれます。基本消費と二重に数えないよう、運動の種類ごとに係数を掛けて「上乗せ分」だけにします。
+Everything you burn outside exercise: basal metabolism, daily activity and the thermic effect of food.
 
-| 種類（Stravaの `sport_type`） | 上乗せ | 理由 |
+```
+BMR       = 10 × weight (kg) + 6.25 × height (cm) − 5 × age + 5     (men)
+BMR       = 10 × weight (kg) + 6.25 × height (cm) − 5 × age − 161   (women)
+Base burn = BMR × activity factor   (rounded to the nearest 100 kcal)
+```
+
+- The BMR formula is **Mifflin-St Jeor** (Mifflin et al., 1990). It is considered close to measured values in healthy adults and is the equation recommended in the Academy of Nutrition and Dietetics' evidence review.
+- The default activity factors are 1.5 on office days and 1.4 on home days: the difference between a day with a walking commute and a day spent mostly sitting. Exercise is added separately from Strava, so it is not included here.
+- Example: man, 45, 175 cm, 70 kg → BMR 1,573.75 kcal → 2,400 kcal on office days, 2,200 kcal on home days.
+- If there is a `Withings` tab, weight and body fat % come from the most recent 7-day average.
+- If the result doesn't match how you feel or what you measure (your weight trend), override it with `base_office_kcal` / `base_home_kcal` on the 設定 tab. Comparing two to three weeks of cumulative balance with the change in your 7-day average weight (1 kg of fat ≈ 7,200 kcal) gives you a basis for adjusting it.
+
+## Exercise extra (fixed in the page)
+
+Strava's calorie figures include what you would have burned at rest anyway. To avoid counting that twice against your base burn, each activity type is multiplied by a factor so that only the extra burn remains.
+
+| Type (Strava `sport_type`) | Extra | Why |
 |---|---|---|
-| ラン（Run、TrailRun、VirtualRun） | Strava×0.93 | ランは強度が高く、安静時の分は全体の1割弱 |
-| スイム（Swim） | 泳いでいた時間（分）×8.5 kcal | Stravaのスイムの値はばらつきが大きいため。中強度のクロール（約8.3 METs）で体重65 kg前後なら、総消費が1分あたり約9 kcal、安静時の1 METを引くと約7.9 kcal。その間をとって8.5 kcal |
-| Zwift（VirtualRide） | Strava×0.8 | パワーメーターの値から出るので比較的正確。安静時の分を差し引く |
-| 自転車（Ride、EBikeRide） | Strava×0.6 | 通勤など強度が低く信号待ちも多いため、安静時の分の割合が大きい。パワーなしの推定は過大になりがち |
-| 筋トレ（WeightTraining） | Strava×0.7 | 休憩時間が長く、心拍からの推定は過大になりがち |
-| その他 | Strava×0.7 | 控えめに見る |
+| Run (Run, TrailRun, VirtualRun) | Strava × 0.93 | Running is intense, so the resting share is under 10% |
+| Swim (Swim) | Minutes swimming × 8.5 kcal | Strava's swim figures vary a lot. Moderate front crawl (about 8.3 METs) at around 65 kg is roughly 9 kcal/min gross, or 7.9 kcal/min after subtracting 1 resting MET; 8.5 splits the difference |
+| Zwift (VirtualRide) | Strava × 0.8 | Based on power meter data, so fairly accurate; the resting share is subtracted |
+| Bike (Ride, EBikeRide) | Strava × 0.6 | Commutes are low intensity with lots of stops, so the resting share is large; estimates without power tend to run high |
+| Strength (WeightTraining) | Strava × 0.7 | Long rests, and heart-rate-based estimates tend to run high |
+| Anything else | Strava × 0.7 | Errs on the low side |
 
-運動のデータはページの中の計算にだけ使い、Claudeへの推定の指示には入れません（Stravaの規約による）。
+Exercise data is used only for calculations inside the page and is never included in the estimate prompt sent to Claude (per Strava's terms).
 
-## 栄養の目標
+## Nutrition targets
 
-| 項目 | 計算 | 既定 | 根拠 |
+| Item | Calculation | Setting | Rationale |
 |---|---|---|---|
-| たんぱく質 | 体重×1.8〜2.0 g | `protein_g_per_kg` | 減量中の持久系アスリートで筋量を保つ目安（ISSN、ACSMの見解で1.6〜2.2 g/kg） |
-| 脂質 | 上限 | 70 g（`fat_max_g`） | 炭水化物とたんぱく質を確保したうえでの残り。脂質比も表示（30%以下で緑） |
-| 炭水化物 | 体重×4 g（運動の上乗せが400 kcal以上の日は×5 g） | `carb_g_per_kg_easy`／`_hard` | 1時間前後の中強度練習の日の目安（ACSM／IOCの5〜7 g/kgより控えめ。減量中のため） |
+| Protein | Body weight × 1.8–2.0 g | `protein_g_per_kg` | A guide for preserving muscle in endurance athletes during weight loss (ISSN and ACSM position stands give 1.6–2.2 g/kg) |
+| Fat | Ceiling | 70 g (`fat_max_g`) | What's left after securing carbs and protein. The fat share of calories is also shown (green at 30% or less) |
+| Carbs | Body weight × 4 g (× 5 g on days with ≥ 400 kcal of exercise extra) | `carb_g_per_kg_easy` / `_hard` | A guide for days with about an hour of moderate training; lower than the ACSM/IOC range of 5–7 g/kg because you're in a deficit |
 
-## エネルギー利用可能量（EA）
+## Energy availability (EA)
 
 ```
-EA = 摂取 − 運動の上乗せ
-下限 = 除脂肪量 × 30 kcal  （除脂肪量 = 体重 × (1 − 体脂肪率/100)）
+EA    = Intake − Exercise extra
+Floor = Fat-free mass × 30 kcal   (fat-free mass = weight × (1 − body fat % / 100))
 ```
 
-除脂肪量1 kgあたり30 kcalを下回る状態が続くと、ホルモンや骨、免疫に影響が出やすい（相対的エネルギー不足、RED-S）とされます。減量中でも下回らないように、ページに「最低でもあと何kcal」を表示します。係数は `ea_kcal_per_kg_ffm` で変えられます。
+Staying below 30 kcal per kg of fat-free mass for long periods is associated with effects on hormones, bones and immunity (relative energy deficiency in sport, RED-S). To keep you above it even in a deficit, the page shows the minimum you still need to eat. Change the factor with `ea_kcal_per_kg_ffm`.
 
-## 推定の補正
+## Estimate adjustments
 
-- ナッツは、成分表の値から約15%（アーモンド単体なら20%）差し引きます。細胞壁に包まれた脂質の一部が吸収されないためで、実測では表示値より消化吸収されるエネルギーが少ないことが報告されています（Novotny et al., 2012；Baer et al., 2016）。
+- Nuts are estimated about 15% below food-table values (20% for almonds on their own). Some of the fat is held inside cell walls and isn't absorbed, and studies have measured less metabolizable energy than labels show (Novotny et al., 2012; Baer et al., 2016).

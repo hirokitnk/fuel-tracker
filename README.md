@@ -1,74 +1,72 @@
-# 燃料帳（fuel-ledger）
+# Fuel Ledger (燃料帳)
 
-**English:** Fuel Ledger is a personal nutrition log for endurance athletes that runs as a private claude.ai Artifact. Snap a photo of your meal, Claude estimates calories and macros, and the result is appended to your own Google Sheet. Strava activities and (optionally) Withings weigh-ins are combined into a daily energy balance, energy availability, and weight trend. Because Artifacts that use connectors cannot be shared, each person publishes their own copy with the included setup skill. The UI and docs are in Japanese.
+Fuel Ledger is a personal nutrition log for endurance athletes that runs as a private claude.ai Artifact. Snap a photo of your meal, Claude estimates calories and macros, and you append the result to your own Google Sheet. Strava activities and (optionally) Withings weigh-ins are combined into a daily energy balance, energy availability and a weight trend. It is designed to be used from Safari on an iPhone.
 
----
+> The app's on-screen text is in Japanese. Documentation is in English.
 
-食事の写真とメモからClaudeが栄養を推定して、自分のGoogleスプレッドシートに記録するページです。Stravaの運動とWithingsの体重を合わせて、1日のエネルギー収支、エネルギー利用可能量、体重の推移を表示します。iPhoneのSafariで使う前提で作っています。
+## What it does
 
-## できること
+<!-- Add screenshots here -->
+<!-- ![Daily balance](docs/images/day.png) -->
+<!-- ![Logging a meal](docs/images/add.png) -->
 
-<!-- スクリーンショットをここに追加 -->
-<!-- ![この日の収支](docs/images/day.png) -->
-<!-- ![食事を記録](docs/images/add.png) -->
+- Claude estimates kcal, protein, fat and carbs from one or more photos plus a short note. You review and edit the numbers, then append one row to your sheet
+- "Intake − Burn = Balance", plus how much protein, fat and carbs you have left for the day
+- Strava activities are converted to the extra burn on top of your resting burn, and added to the day
+- A warning when energy availability (intake − exercise) drops below your floor
+- A 14-day balance chart
+- Withings 7-day average weight and weekly fat mass (optional)
 
-- 写真（複数可）とメモから、Claudeがkcal・たんぱく質・脂質・炭水化物を推定。確かめて直してからシートに1行追加
-- 「摂取 − 消費 ＝ 収支」と、たんぱく質・脂質・炭水化物の目標までの残り
-- Stravaの運動を、安静時の分を差し引いた「上乗せ」に換算して消費に足す
-- エネルギー利用可能量（摂取 − 運動）が下限を割っていないかの表示
-- 14日間の収支グラフ
-- Withingsの体重の7日平均と、週ごとの体脂肪量（任意）
+## What you need
 
-## 必要なもの
+- A **paid Claude plan** (Pro, Max, Team or Enterprise). Photo estimates **use your own Claude usage**
+- A paid **Strava** subscription (required by the Strava connector on claude.ai)
+- **Google Sheets** (a Google account)
+- **Claude Code** or the **Claude desktop app** (only for publishing the page)
+- A Withings scale (optional)
 
-- **Claudeの有料プラン**（Pro／Max／Team／Enterprise）。写真からの推定は**自分のClaudeの使用量を使います**
-- **Strava**の有料プラン（claude.aiのStravaコネクタに必要）
-- **Googleスプレッドシート**（Googleアカウント）
-- **Claude Code** か **Claudeデスクトップアプリ**（公開するときだけ）
-- Withingsの体重計（任意）
+## Setup
 
-## セットアップ
+### 1. Copy the template sheet
 
-### ① テンプレートをコピーする
+Open [Copy the template](https://docs.google.com/spreadsheets/d/1X_fhxmI3Py8gC3MUcaeueAt_wIkLuNCgnepKfR4oQUw/copy) and click "Make a copy". You get a sheet with two tabs, 食事ログ (meal log) and 設定 (settings), in your own Drive. Keep the tab names exactly as they are; the page looks them up by name.
 
-[テンプレートをコピー](https://docs.google.com/spreadsheets/d/1X_fhxmI3Py8gC3MUcaeueAt_wIkLuNCgnepKfR4oQUw/copy) を開き、「コピーを作成」を押します。「食事ログ」「設定」の2つのタブがあるシートが自分のドライブにできます。
+To build the sheet by hand instead, follow the column layout in [template/README.md](template/README.md).
 
-シートを自分で作る場合は [template/README.md](template/README.md) の列定義のとおりに作ってください。
+### 2. Connect Google Sheets and Strava on claude.ai
 
-### ② claude.aiでGoogle SheetsとStravaを連携する
+On claude.ai, go to **Settings → Connectors**, add **Google Sheets** and **Strava**, and sign in to each.
 
-claude.aiの **設定 → コネクタ** で、**Google Sheets** と **Strava** を追加してサインインします。
+### 3. Install the skill and ask Claude to set it up
 
-### ③ スキルを入れて「燃料帳をセットアップして」と頼む
-
-1. このリポジトリを手元に置きます。
+1. Clone this repository.
 
    ```bash
    git clone https://github.com/hirokitnk/fuel-ledger.git
    ```
 
-2. スキルを入れます（Claude Codeの場合）。
+2. Install the skill (Claude Code).
 
    ```bash
    mkdir -p ~/.claude/skills && cp -r fuel-ledger/skills/fuel-ledger-setup ~/.claude/skills/
    ```
 
-3. Claude Codeかデスクトップアプリで、クローンしたフォルダを開いて「燃料帳をセットアップして」と頼みます。シートのURLを聞かれるので①のURLを渡します。年齢・身長などが空なら聞かれます。最後に自分専用のページのリンクが出ます。
+3. In Claude Code or the desktop app, open the cloned folder and say "Set up Fuel Ledger" (or 「燃料帳をセットアップして」). Claude asks for your sheet URL from step 1 and, if they are blank, your age, height and so on. At the end you get a link to your own private page.
 
-### ④ iPhoneのSafariで開いてホーム画面に追加する
+### 4. Open it in Safari on your iPhone and add it to the Home Screen
 
-1. ③で出たリンクを**iPhoneのSafari**で開き、claude.aiにサインインします
-2. 共有ボタン → **「ホーム画面に追加」**
-3. 初回は、Google Sheets、Strava、Claudeの利用を許可する画面が出るので許可します
+1. Open the link from step 3 in **Safari on your iPhone** and sign in to claude.ai
+2. Tap Share → **Add to Home Screen**
+3. The first time, approve the prompts that let the page use Google Sheets, Strava and Claude
 
-使い方：画面下の **「＋ 記録」** → 写真ボタンで撮影かライブラリから選ぶ → メモに量や中身を書く（例：ご飯130g、揚げ物は鶏ささみ）→ **推定する** → 数字を確かめて **スプレッドシートに記録**。
+Day to day: tap **"＋ 記録"** (Log) at the bottom → take a photo or pick one from your library → add a note on amounts (e.g. "rice 130 g, the fried item is chicken breast") → **推定する** (Estimate) → check the numbers → **スプレッドシートに記録** (Save to sheet).
 
-### スキルを使わない手動の手順
+### Manual setup (without the skill)
 
-1. ①②を済ませます
-2. `app/fuel-ledger.html` をコピーし、先頭近くの `const SPREADSHEET_ID = "__SPREADSHEET_ID__";` を自分のシートのID（URLの `/d/` と次の `/` の間）に置き換えます
-3. 「設定」タブに年齢・性別・身長・体重・体脂肪率を書きます
-4. Claude Codeかデスクトップアプリで、「このHTMLをアーティファクトとして公開して。機能は次のとおり」と頼み、次の宣言を渡します
+1. Do steps 1 and 2
+2. Copy `app/fuel-ledger.html` and replace `__SPREADSHEET_ID__` in `const SPREADSHEET_ID = "__SPREADSHEET_ID__";` near the top with your sheet's ID (the part of the URL between `/d/` and the next `/`)
+3. Fill in age, sex, height, weight and body fat % on the 設定 tab
+4. In Claude Code or the desktop app, ask Claude to "publish this HTML as an Artifact with these capabilities" and give it this declaration:
 
    ```json
    {
@@ -80,43 +78,43 @@ claude.aiの **設定 → コネクタ** で、**Google Sheets** と **Strava** 
    }
    ```
 
-5. ④のとおりiPhoneで開きます
+5. Open it on your iPhone as in step 4
 
-### 更新するとき
+### Updating
 
-リポジトリを `git pull` してから、「燃料帳を更新して」と頼みます。前に公開したアーティファクトのURLを渡して公開し直すので、**リンクは変わりません**。
+Run `git pull`, then ask Claude to "update Fuel Ledger". It republishes to the URL of the Artifact you published before, so **your link stays the same**.
 
-## Withingsの体重を入れる
+## Adding Withings weight data
 
-任意です。燃料帳のシートに「Withings」タブがあれば、体重の推移と週ごとの体脂肪量を表示し、基本消費の計算に直近7日の平均体重・体脂肪率を使います。
+This is optional. If your sheet has a tab named `Withings`, the page shows your weight trend and weekly fat mass, and uses your 7-day average weight and body fat % to calculate your base burn.
 
-標準の手順はIFTTTのアプレット（Withings → Google Sheets）で別のファイルに書き込み、`IMPORTRANGE` で「Withings」タブに読み込む方法です。詳しくは [docs/withings-ifttt.md](docs/withings-ifttt.md)。Apps ScriptでWithingsのAPIから書き込んでいる形式（A＝日時、B＝体重、C＝体脂肪率）もそのまま読めます。
+The standard route is an IFTTT applet (Withings → Google Sheets) that writes to a separate file, which you pull into the `Withings` tab with `IMPORTRANGE`. See [docs/withings-ifttt.md](docs/withings-ifttt.md). Sheets filled by an Apps Script from the Withings API (A = date/time, B = weight, C = body fat %) also work as they are.
 
-## 計算のルール（要約）
+## Calculation rules (summary)
 
-- **基本消費**＝基礎代謝（Mifflin-St Jeor式）×活動係数（出社日1.5、在宅日1.4）を100 kcal単位に丸めたもの。「設定」タブで上書きできます
-- **運動の上乗せ**：ラン＝Strava×0.93、スイム＝泳いだ時間×8.5 kcal/分、Zwift＝×0.8、自転車＝×0.6、筋トレ＝×0.7、その他＝×0.7
-- **摂取目標**＝基本消費＋上乗せ−赤字目標（既定300 kcal）
-- **エネルギー利用可能量の下限**＝除脂肪量×30 kcal
-- **たんぱく質**＝体重×1.8〜2.0 g、**脂質**＝70 g以下、**炭水化物**＝体重×4 g（上乗せ400 kcal以上の日は×5 g）
-- ナッツは吸収率を考慮して約15%（アーモンドは20%）差し引いて推定
+- **Base burn** = basal metabolic rate (Mifflin-St Jeor) × activity factor (1.5 on office days, 1.4 on home days), rounded to the nearest 100 kcal. You can override it on the 設定 tab
+- **Exercise extra**: run = Strava × 0.93, swim = minutes swimming × 8.5 kcal/min, Zwift = × 0.8, bike = × 0.6, strength = × 0.7, anything else = × 0.7
+- **Intake target** = base burn + exercise extra − daily deficit (300 kcal by default)
+- **Energy availability floor** = fat-free mass × 30 kcal
+- **Protein** = body weight × 1.8–2.0 g, **fat** ≤ 70 g, **carbs** = body weight × 4 g (× 5 g on days with ≥ 400 kcal of exercise extra)
+- Nuts are estimated about 15% below food-table values (20% for almonds) to account for incomplete absorption
 
-根拠と詳細は [docs/calculation-rules.md](docs/calculation-rules.md)。
+Details and sources: [docs/calculation-rules.md](docs/calculation-rules.md).
 
-## 制限
+## Limitations
 
-- **iPhoneのClaudeアプリでは、連携（Google Sheets、Strava）が動かない可能性が高い**です。Safariでclaude.aiのリンクを開いて使ってください
-- **連携つきのアーティファクトは、他の人と共有できません。** 誰かが公開したリンクをもらっても使えないので、各自がセットアップしてください
-- 出社・在宅の切り替えは、**端末（ブラウザ）ごとに記憶**されます。iPhoneとパソコンで別々です
-- 記録した行の**修正・削除はスプレッドシートで**行ってください。ページは追加だけです
-- 個人設定の変更もスプレッドシートの「設定」タブで行い、ページの ↻ で読み込み直します
+- **Connectors (Google Sheets, Strava) probably don't work inside the Claude iPhone app.** Open the claude.ai link in Safari instead
+- **Artifacts that use connectors can't be shared with other people.** A link someone else published won't work for you, so everyone sets up their own copy
+- The office/home toggle is **remembered per device (browser)**, so your iPhone and computer keep separate settings
+- **Edit or delete logged rows in the spreadsheet.** The page only appends
+- Change personal settings on the 設定 tab, then tap ↻ on the page to reload them
 
-## 注意
+## Disclaimer
 
-- 燃料帳は**医療や栄養指導の代わりではありません。** 持病がある人、妊娠中の人、食事制限を指示されている人は、医師や管理栄養士に相談してください
-- 写真からの推定値には**誤差があります**（特に外食や量の分からない料理）。確度「低」の記録は参考程度に見てください
-- **Stravaのデータはページの中の計算にだけ使い、Claudeには送りません**（Stravaの規約による）。Claudeに送るのは、食事の写真・メモ・「設定」タブの年齢などの属性・よく食べる市販品の表です
+- Fuel Ledger is **not a substitute for medical or nutritional advice.** If you have a medical condition, are pregnant, or have been told to restrict your diet, talk to a doctor or registered dietitian
+- Estimates from photos **are approximate**, especially for restaurant food or dishes whose amounts are unclear. Treat entries marked 低 (low confidence) as rough guides
+- **Strava data is used only for calculations inside the page and is never sent to Claude** (per Strava's terms). Claude receives your meal photos and notes, your profile from the 設定 tab (age and so on), and your list of frequently eaten products
 
-## ライセンス
+## License
 
 [MIT](LICENSE)

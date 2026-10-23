@@ -1,68 +1,68 @@
-# スプレッドシートの列定義
+# Spreadsheet layout
 
-テンプレートをコピーせず、自分でシートを作る人向けです。タブ名は下のとおり（全角・半角も同じ）にしてください。
+For people who build the sheet by hand instead of copying the template. Tab names must match exactly (including full-width/half-width characters).
 
-## 「食事ログ」タブ（必須）
+## 食事ログ tab (meal log, required)
 
-1行目は見出し、2行目以降がデータ。ページは `食事ログ!A2:H5000` を読み、記録ボタンで末尾に1行追加します。
+Row 1 is the header; data starts on row 2. The page reads `食事ログ!A2:H5000` and appends one row when you save.
 
-| 列 | 見出し | 中身 |
+| Column | Header | Contents |
 |---|---|---|
-| A | 日付 | `YYYY-MM-DD`（書式なしテキスト推奨） |
-| B | 区分 | 朝／昼／夕／間食／運動中 |
-| C | 内容 | 品目と量を「、」でつないだ説明 |
-| D | エネルギー(kcal) | 数値 |
-| E | たんぱく質(g) | 数値 |
-| F | 脂質(g) | 数値 |
-| G | 炭水化物(g) | 数値 |
-| H | 確度 | 高／中／低 |
+| A | 日付 | Date, `YYYY-MM-DD` (plain text recommended) |
+| B | 区分 | Meal: 朝 (breakfast) / 昼 (lunch) / 夕 (dinner) / 間食 (snack) / 運動中 (during exercise) |
+| C | 内容 | Items and amounts joined with 「、」 |
+| D | エネルギー(kcal) | Number |
+| E | たんぱく質(g) | Protein, number |
+| F | 脂質(g) | Fat, number |
+| G | 炭水化物(g) | Carbs, number |
+| H | 確度 | Confidence: 高 (high) / 中 (medium) / 低 (low) |
 
-A列はGoogleスプレッドシートが日付に自動変換すると `2026/01/15` のように表示が変わり、ページが読めなくなることがあります。A列を選んで「表示形式 → 数字 → 書式なしテキスト」にしておいてください。
+If Google Sheets auto-converts column A to dates, they may display as `2026/01/15` and the page can no longer match them. Select column A and choose Format → Number → Plain text.
 
-## 「設定」タブ（推奨）
+## 設定 tab (settings, recommended)
 
-A列にキー、B列に値、C列に説明。ページは `設定!A1:J200` を読みます。キーがない・値が空のときは既定値を使います。
+Keys in column A, values in column B, descriptions in column C. The page reads `設定!A1:J200`. Missing keys and blank values fall back to the defaults.
 
-| キー | 例 | 既定値 | 説明 |
+| Key | Example | Default | Description |
 |---|---|---|---|
-| `age` | 45 | 40 | 年齢 |
-| `sex` | male | male | male／female |
-| `height_cm` | 172 | 170 | 身長 |
-| `weight_kg` | 68 | 65 | 体重（Withingsタブがあれば直近7日平均で上書き） |
-| `body_fat_pct` | 18 | 20 | 体脂肪率（Withingsタブがあれば直近7日平均で上書き） |
-| `activity_office` | 1.5 | 1.5 | 出社日の活動係数 |
-| `activity_home` | 1.4 | 1.4 | 在宅日の活動係数 |
-| `base_office_kcal` | （空欄） | — | 出社日の基本消費。入れたら自動計算より優先 |
-| `base_home_kcal` | （空欄） | — | 在宅日の基本消費。入れたら自動計算より優先 |
-| `deficit_kcal` | 300 | 300 | 1日の赤字目標 |
-| `protein_g_per_kg` | 1.8-2.0 | 1.8-2.0 | たんぱく質の目標範囲（体重1kgあたり） |
-| `fat_max_g` | 70 | 70 | 脂質の上限 |
-| `carb_g_per_kg_easy` | 4 | 4 | 運動の少ない日の炭水化物（体重1kgあたり） |
-| `carb_g_per_kg_hard` | 5 | 5 | 運動の上乗せ400kcal以上の日の炭水化物 |
-| `ea_kcal_per_kg_ffm` | 30 | 30 | エネルギー利用可能量の下限（除脂肪量1kgあたり） |
-| `goal_note` | 〇〇マラソン2027 | （空） | ヘッダーに出す目標。推定の指示にも入る |
-| `withings_col_date` | A | A | Withingsタブの日時の列 |
-| `withings_col_weight` | B | B | Withingsタブの体重の列 |
-| `withings_col_fat` | C | C | Withingsタブの体脂肪率の列（ない場合は空欄） |
+| `age` | 45 | 40 | Age |
+| `sex` | male | male | male / female |
+| `height_cm` | 172 | 170 | Height |
+| `weight_kg` | 68 | 65 | Weight (replaced by the 7-day average if there is a Withings tab) |
+| `body_fat_pct` | 18 | 20 | Body fat % (replaced by the 7-day average if there is a Withings tab) |
+| `activity_office` | 1.5 | 1.5 | Activity factor on office days |
+| `activity_home` | 1.4 | 1.4 | Activity factor on home days |
+| `base_office_kcal` | (blank) | — | Base burn on office days. Overrides the calculation when set |
+| `base_home_kcal` | (blank) | — | Base burn on home days. Overrides the calculation when set |
+| `deficit_kcal` | 300 | 300 | Daily deficit target |
+| `protein_g_per_kg` | 1.8-2.0 | 1.8-2.0 | Protein target range per kg of body weight |
+| `fat_max_g` | 70 | 70 | Fat ceiling |
+| `carb_g_per_kg_easy` | 4 | 4 | Carbs per kg on light days |
+| `carb_g_per_kg_hard` | 5 | 5 | Carbs per kg on days with ≥ 400 kcal of exercise extra |
+| `ea_kcal_per_kg_ffm` | 30 | 30 | Energy availability floor per kg of fat-free mass |
+| `goal_note` | Some Marathon 2027 | (blank) | Goal shown in the header and included in the estimate prompt |
+| `withings_col_date` | A | A | Withings tab column holding the date/time |
+| `withings_col_weight` | B | B | Withings tab column holding the weight |
+| `withings_col_fat` | C | C | Withings tab column holding body fat % (blank if none) |
 
-### よく食べる市販品（同じタブのE列から）
+### Frequently eaten products (same tab, from column E)
 
-E1に `品名` と書いた見出し行を置き、その下に1行1品で書きます。Claudeの推定の指示に「既知の値」として差し込まれます。
+Put a header row with `品名` in E1, then one product per row below it. These are inserted into Claude's estimate prompt as known values.
 
-| E 品名 | F 量 | G kcal | H たんぱく質 | I 脂質 | J 炭水化物 |
+| E 品名 (name) | F 量 (amount) | G kcal | H たんぱく質 (protein) | I 脂質 (fat) | J 炭水化物 (carbs) |
 |---|---|---|---|---|---|
 | be LEGEND WEIGHT DOWN | 30g | 114.5 | 21.8 | 0.9 | 4.9 |
 | オイコス プレーン砂糖不使用 | 1個 | 72 | 13 | 0 | 5 |
 | マルトデキストリン | 20g | 80 | 0 | 0 | 20 |
 | 納豆（たれ込み） | 1パック | 95 | 8 | 5 | 6 |
 
-## 「Withings」タブ（任意）
+## Withings tab (optional)
 
-ページは `Withings!A1:H5000` を読むだけで、書き込みはしません。見出し行や読めない行は飛ばします。同じ日に複数回計測した場合は、下にある行（あとの計測）を使います。
+The page only reads `Withings!A1:H5000`; it never writes. Header rows and unreadable rows are skipped. If you weigh in more than once a day, the lower (later) row wins.
 
-読める形式：
+Supported formats:
 
-- **Apps Script形式**：A＝日時 `2026-01-15 07:30`、B＝体重(kg)、C＝体脂肪率(%)、D＝筋肉量、E＝grpid
-- **IFTTT形式**：A＝日時 `January 15, 2026 at 07:30AM`、B＝体重、C＝体脂肪率、D＝単位（`kg`／`lbs`）。詳しくは [docs/withings-ifttt.md](../docs/withings-ifttt.md)
+- **Apps Script format**: A = date/time `2026-01-15 07:30`, B = weight (kg), C = body fat (%), D = muscle mass, E = grpid
+- **IFTTT format**: A = date/time `January 15, 2026 at 07:30AM`, B = weight, C = body fat %, D = unit (`kg` / `lbs`). See [docs/withings-ifttt.md](../docs/withings-ifttt.md)
 
-行のどこかに `lb`／`lbs` と書かれていれば、体重をkgに換算します。列の並びが違う場合は「設定」タブの `withings_col_*` で指定してください。
+If any cell in a row says `lb` or `lbs`, the weight is converted to kg. If your columns are in a different order, set `withings_col_*` on the 設定 tab.

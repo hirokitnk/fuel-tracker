@@ -1,41 +1,43 @@
 ---
 name: fuel-ledger-setup
-description: 燃料帳（fuel-ledger）を自分のclaude.aiアカウントにアーティファクトとして公開するときに使う。「燃料帳をセットアップして」「燃料帳を更新して」と頼まれたら、コネクタの確認、スプレッドシートの確認と設定、ページの公開までを行う。
+description: Use when someone asks to set up or update Fuel Ledger (燃料帳), e.g. "Set up Fuel Ledger", "Update Fuel Ledger", 「燃料帳をセットアップして」; checks the connectors and the spreadsheet, fills in settings, and publishes the page as the user's own private claude.ai Artifact.
 ---
 
-# 燃料帳のセットアップ
+# Setting up Fuel Ledger
 
-燃料帳は、食事の写真とメモからClaudeが栄養を推定してGoogleスプレッドシートに記録し、Stravaの運動とWithingsの体重から日々のエネルギー収支を表示するページです。連携つきのアーティファクトは他の人と共有できないので、**使う人が自分のアカウントで公開する**必要があります。このスキルはその手順です。
+Fuel Ledger is a page where Claude estimates nutrition from meal photos and notes and logs it to a Google Sheet, and that shows a daily energy balance from Strava activities and Withings weight. Artifacts that use connectors can't be shared, so **each person has to publish their own copy**. This skill walks through that.
 
-ページ本体は、このスキルと同じリポジトリの `app/fuel-ledger.html` です。手元にない場合は https://github.com/hirokitnk/fuel-ledger から取得してください（`git clone` か、`https://raw.githubusercontent.com/hirokitnk/fuel-ledger/main/app/fuel-ledger.html` を保存）。
+The page itself is `app/fuel-ledger.html` in the same repository as this skill. If it isn't available locally, get it from https://github.com/hirokitnk/fuel-ledger (`git clone`, or save `https://raw.githubusercontent.com/hirokitnk/fuel-ledger/main/app/fuel-ledger.html`).
 
-## 1. 前提を確かめる
+The page's on-screen text is Japanese. Talk to the user in whatever language they use.
 
-1. このセッションのツール一覧に、Google SheetsとStravaのコネクタのツールがあるか確かめる。名前は `mcp__<id>__get_values`、`mcp__<id>__append_values`、`mcp__<id>__list_activities` のような形で出る。どのidがどのコネクタかは、`artifact-capabilities` スキルを読むと分かる。
-   - ない場合は、「claude.aiの設定 → コネクタで、Google SheetsとStravaを追加してから、このセッションを開き直してください」と伝えて止まる。StravaのコネクタにはStravaの有料プランが必要。
-2. Artifactツールが使えるか確かめる（Claude CodeかClaudeデスクトップアプリ）。使えなければ、そう伝えて止まる。
-3. `artifact-capabilities` スキルを読み、`mcp` と `sample` が使える機能に入っていることを確かめる。
+## 1. Check prerequisites
 
-## 2. スプレッドシートを確かめる
+1. Check that this session's tool list includes Google Sheets and Strava connector tools. They appear as names like `mcp__<id>__get_values`, `mcp__<id>__append_values` and `mcp__<id>__list_activities`. Read the `artifact-capabilities` skill to see which id belongs to which connector.
+   - If they're missing, tell the user: "Add Google Sheets and Strava under claude.ai Settings → Connectors, then reopen this session." Then stop. The Strava connector requires a paid Strava subscription.
+2. Check that the Artifact tool is available (Claude Code or the Claude desktop app). If it isn't, say so and stop.
+3. Read the `artifact-capabilities` skill and confirm that `mcp` and `sample` are among the available capabilities.
 
-1. 先にREADMEの「テンプレートをコピー」のリンクからシートをコピーしてもらい、そのURLを聞く。
-2. URLの `/d/` と次の `/` の間をスプレッドシートIDとして取り出す。
-3. `get_values` で `食事ログ!A1:H2` と `設定!A1:J200` を読む。
-   - 読めないタブがあれば、どのタブがないかを伝え、作ってよいか聞く。了承を得たら、Google Sheetsのコネクタのタブ追加のツール（`update_spreadsheet` など。ツールの説明を読んで選ぶ）で作り、`template/README.md` の見出しと既定値を `update_values` で書く。
-   - `食事ログ` の見出しは `日付, 区分, 内容, エネルギー(kcal), たんぱく質(g), 脂質(g), 炭水化物(g), 確度`。
-4. `Withings!A1:E5` も読んでみる。なければ任意であることと、`docs/withings-ifttt.md` の手順を伝える。
+## 2. Check the spreadsheet
 
-## 3. 設定を埋める
+1. Ask the user to copy the sheet first, using the "Copy the template" link in the README, and then ask for the URL of their copy.
+2. Take the spreadsheet ID from the URL: the part between `/d/` and the next `/`.
+3. Read `食事ログ!A1:H2` and `設定!A1:J200` with `get_values`.
+   - If a tab can't be read, tell the user which one is missing and ask whether to create it. If they agree, create it with the Google Sheets connector's add-tab tool (`update_spreadsheet` or similar; read the tool's description to choose), then write the headers and defaults from `template/README.md` with `update_values`.
+   - The 食事ログ headers are `日付, 区分, 内容, エネルギー(kcal), たんぱく質(g), 脂質(g), 炭水化物(g), 確度`.
+4. Also try reading `Withings!A1:E5`. If it doesn't exist, explain that it's optional and point to the steps in `docs/withings-ifttt.md`.
 
-「設定」タブの `age`、`sex`、`height_cm`、`weight_kg`、`body_fat_pct` が空なら、本人に値を聞く。書き込む内容（セル番地と値）を見せて**同意を得てから** `update_values` で書く。体重と体脂肪率は、Withingsタブがあればそちらの直近7日平均が優先されることも伝える。`goal_note`（目標の大会など）も任意で聞く。
+## 3. Fill in settings
 
-基本消費の自動計算（Mifflin-St Jeor式×活動係数）の結果を伝え、実感と違えば `base_office_kcal`／`base_home_kcal` で上書きできると伝える。
+If `age`, `sex`, `height_cm`, `weight_kg` or `body_fat_pct` on the 設定 tab are blank, ask the user for them. Show what you'll write (cells and values) and **get their consent before** writing with `update_values`. Mention that if there is a Withings tab, its most recent 7-day average weight and body fat % take priority. Optionally ask for `goal_note` (e.g. a target race).
 
-## 4. ページを公開する
+Tell them the base burn that results from the calculation (Mifflin-St Jeor × activity factor), and that they can override it with `base_office_kcal` / `base_home_kcal` if it doesn't feel right.
 
-1. `app/fuel-ledger.html` を読み、`const SPREADSHEET_ID = "__SPREADSHEET_ID__";` の `__SPREADSHEET_ID__` を手順2のIDに置き換えたコピーを、スクラッチパッドなど作業用のディレクトリに書く（リポジトリの元ファイルは変えない）。ファイル名は `fuel-ledger.html` のままにする。
-2. ページが呼ぶツール名（`get_values`、`append_values`、`list_activities`）が、このセッションのコネクタのツール名と一致するか確かめる。違う名前なら、ページの `callTool(SHEETS, "...")`／`callTool(STRAVA, "...")` と下の宣言を合わせて直し、何を変えたか本人に伝える。引数の名前（`spreadsheetId`、`range`、`values`、`first`、`range_start`、`range_end`）もツールの入力スキーマと照らし合わせる。
-3. Artifactツールで公開する。初回は `icon: "food"` をつけ、次の機能を宣言する。
+## 4. Publish the page
+
+1. Read `app/fuel-ledger.html` and write a copy to a working directory such as your scratchpad, with `__SPREADSHEET_ID__` in `const SPREADSHEET_ID = "__SPREADSHEET_ID__";` replaced by the ID from step 2. Don't modify the original in the repository. Keep the file name `fuel-ledger.html`.
+2. Check that the tool names the page calls (`get_values`, `append_values`, `list_activities`) match this session's connector tool names. If they differ, change the page's `callTool(SHEETS, "...")` / `callTool(STRAVA, "...")` and the declaration below to match, and tell the user what you changed. Also check the argument names (`spreadsheetId`, `range`, `values`, `first`, `range_start`, `range_end`) against the tools' input schemas.
+3. Publish with the Artifact tool. On the first publish, pass `icon: "food"` and declare these capabilities:
 
    ```json
    {
@@ -47,16 +49,16 @@ description: 燃料帳（fuel-ledger）を自分のclaude.aiアカウントに�
    }
    ```
 
-   `server` はコネクタの表示名そのもの（`artifact-capabilities` スキルが示す名前）にする。
-4. 公開できたらリンクを伝える。ページを開くと、Google Sheets、Strava、Claudeの利用を許可する画面が順に出ることを伝える。
+   `server` must be the connector's display name exactly as the `artifact-capabilities` skill shows it.
+4. Once published, give the user the link. Tell them that when they open the page they'll be asked, in turn, to allow Google Sheets, Strava and Claude.
 
-## 5. iPhoneでの使い方を伝える
+## 5. Explain how to use it on an iPhone
 
-- 公開したリンクを**iPhoneのSafari**で開き、claude.aiにサインインする。iPhoneのClaudeアプリでは連携が動かない可能性が高い。
-- 共有ボタン → 「ホーム画面に追加」で、アプリのように開ける。
-- 初回は、Google Sheets、Strava、Claudeの利用を許可する画面が出るので許可する。
-- 画面下の「＋ 記録」から写真を撮るかライブラリから選び、「推定する」→ 数字を確かめて「スプレッドシートに記録」。
+- Open the published link in **Safari on the iPhone** and sign in to claude.ai. Connectors probably don't work inside the Claude iPhone app.
+- Tap Share → "Add to Home Screen" to open it like an app.
+- The first time, approve the prompts for Google Sheets, Strava and Claude.
+- Tap "＋ 記録" (Log) at the bottom, take a photo or pick one from the library, tap 推定する (Estimate), check the numbers, then tap スプレッドシートに記録 (Save to sheet).
 
-## 6. 更新するとき
+## 6. Updating
 
-リポジトリの `app/fuel-ledger.html` が新しくなったら、同じ手順4で、**前に公開したアーティファクトのURLを `url` に渡して**公開し直す。URLが分からなければ Artifactツールの `action: "list"` で探す。こうするとリンクは変わらず、ホーム画面のアイコンもそのまま使える。機能の宣言を変えないなら `capabilities` は省いてよい（前の宣言が引き継がれる）。
+When `app/fuel-ledger.html` in the repository changes, publish again as in step 4, **passing the URL of the previously published Artifact as `url`**. If you don't know the URL, find it with the Artifact tool's `action: "list"`. The link stays the same, so the Home Screen icon keeps working. If the capabilities haven't changed, you can omit `capabilities` (the previous declaration carries over).
