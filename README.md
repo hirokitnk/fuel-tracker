@@ -31,7 +31,7 @@
 
 ### ① テンプレートをコピーする
 
-[テンプレートをコピー](https://docs.google.com/spreadsheets/d/TEMPLATE_SPREADSHEET_ID/copy) を開き、「コピーを作成」を押します。「食事ログ」「設定」の2つのタブがあるシートが自分のドライブにできます。
+[テンプレートをコピー](https://docs.google.com/spreadsheets/d/1X_fhxmI3Py8gC3MUcaeueAt_wIkLuNCgnepKfR4oQUw/copy) を開き、「コピーを作成」を押します。「食事ログ」「設定」の2つのタブがあるシートが自分のドライブにできます。
 
 シートを自分で作る場合は [template/README.md](template/README.md) の列定義のとおりに作ってください。
 
