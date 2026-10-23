@@ -1,0 +1,1030 @@
+<title>燃料帳</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: one narrow column like a training logbook page — a ledger equation on top, then the day's entries, then the trend. */
+:root {
+  --bg: #eef1f4;
+  --paper: #ffffff;
+  --ink: #15202b;
+  --ink-2: #4c5966;
+  --ink-3: #8a96a3;
+  --rule: #d8dee5;
+  --accent: #2f45c4;
+  --accent-soft: #e4e8fb;
+  --good: #137a5a;
+  --good-soft: #dcf1e8;
+  --warn: #b0640b;
+  --warn-soft: #fbecd6;
+  --bad: #b83232;
+  --bad-soft: #f8e0e0;
+  --font-display: "Zen Kaku Gothic New", "Hiragino Sans", "Noto Sans JP", system-ui, sans-serif;
+  --font-body: "Zen Kaku Gothic New", "Hiragino Sans", "Noto Sans JP", system-ui, sans-serif;
+  --font-num: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f151b; --paper: #18212a; --ink: #e8edf2; --ink-2: #b2bdc8; --ink-3: #7c8996; --rule: #2a3540;
+  --accent: #8b9cff; --accent-soft: #23295a; --good: #4fc79c; --good-soft: #143a2e; --warn: #f0a94a; --warn-soft: #3d2a10;
+  --bad: #f08080; --bad-soft: #401c1c; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0f151b; --paper: #18212a; --ink: #e8edf2; --ink-2: #b2bdc8; --ink-3: #7c8996; --rule: #2a3540;
+  --accent: #8b9cff; --accent-soft: #23295a; --good: #4fc79c; --good-soft: #143a2e; --warn: #f0a94a; --warn-soft: #3d2a10;
+  --bad: #f08080; --bad-soft: #401c1c; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.6; }
+.wrap { max-width: 760px; margin: 0 auto; padding-block: 20px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 28px; }
+.num { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+h1, h2, h3 { font-family: var(--font-display); margin: 0; text-wrap: balance; }
+h2 { font-size: 13px; font-weight: 700; letter-spacing: .12em; color: var(--ink-2); }
+button, select, input, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+header.top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 20px; }
+.brand { display: flex; flex-direction: column; gap: 2px; }
+.brand h1 { font-size: 30px; font-weight: 900; letter-spacing: .04em; line-height: 1.1; }
+.brand p { margin: 0; color: var(--ink-3); font-size: 12px; letter-spacing: .06em; }
+.datebar { display: flex; align-items: center; gap: 6px; }
+.iconbtn { width: 44px; height: 44px; border-radius: 8px; border: 1px solid var(--rule); background: var(--paper); display: grid; place-items: center; font-size: 16px; }
+.datebar input[type=date] { height: 44px; min-width: 0; border: 1px solid var(--rule); border-radius: 8px; background: var(--paper); padding: 0 10px; font-family: var(--font-num); }
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; background: var(--paper); }
+.seg button { border: 0; background: transparent; padding: 6px 14px; min-height: 44px; font-size: 13px; color: var(--ink-2); }
+.seg button[aria-pressed=true] { background: var(--ink); color: var(--paper); }
+
+.panel { background: var(--paper); border: 1px solid var(--rule); border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.muted { color: var(--ink-3); font-size: 12px; }
+.status { font-size: 13px; color: var(--ink-2); background: var(--warn-soft); border-radius: 8px; padding: 8px 12px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.status.err { background: var(--bad-soft); color: var(--bad); }
+.status button { border: 1px solid currentColor; background: transparent; border-radius: 6px; padding: 2px 12px; font-size: 12px; min-height: 44px; }
+
+/* ledger */
+.ledger { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: end; gap: 8px; }
+.ledger .cell { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ledger .lbl { font-size: 12px; color: var(--ink-3); letter-spacing: .08em; }
+.ledger .val { font-family: var(--font-num); font-size: clamp(22px, 6vw, 34px); font-weight: 600; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.ledger .op { font-family: var(--font-num); font-size: 22px; color: var(--ink-3); padding-bottom: 4px; }
+.ledger .sub { font-size: 12px; color: var(--ink-2); font-family: var(--font-num); }
+.ledger .result .val.good { color: var(--good); }
+.ledger .result .val.warn { color: var(--warn); }
+.ledger .result .val.bad { color: var(--bad); }
+@media (max-width: 520px) {
+  .ledger { grid-template-columns: 1fr 1fr; }
+  .ledger .op { display: none; }
+  .ledger .result { grid-column: 1 / -1; border-top: 1px dashed var(--rule); padding-top: 10px; }
+}
+.pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; border-radius: 999px; padding: 3px 10px; background: var(--accent-soft); color: var(--accent); font-weight: 500; }
+.pill.good { background: var(--good-soft); color: var(--good); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pill.bad { background: var(--bad-soft); color: var(--bad); }
+
+.meters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 20px; }
+@media (max-width: 520px) { .meters { grid-template-columns: minmax(0, 1fr); } }
+.meter { display: flex; flex-direction: column; gap: 6px; }
+.meter .row { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; }
+.meter .row .num { color: var(--ink-2); }
+.track { position: relative; height: 8px; border-radius: 4px; background: var(--rule); overflow: visible; }
+.fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: var(--accent); max-width: 100%; }
+.fill.good { background: var(--good); } .fill.warn { background: var(--warn); } .fill.bad { background: var(--bad); }
+.band { position: absolute; top: -3px; bottom: -3px; border-left: 2px solid var(--ink-2); border-right: 2px solid var(--ink-2); opacity: .5; }
+.tick { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--ink); }
+.remain { font-size: 14px; color: var(--ink-2); border-top: 1px solid var(--rule); padding-top: 12px; }
+.remain strong { color: var(--ink); font-family: var(--font-num); }
+
+/* lists */
+.list { display: flex; flex-direction: column; }
+.item { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 4px 12px; padding: 10px 0; border-top: 1px solid var(--rule); align-items: baseline; }
+.item:first-child { border-top: 0; }
+.kubun { font-size: 12px; font-weight: 700; color: var(--accent); letter-spacing: .06em; }
+.item .desc { font-size: 14px; overflow-wrap: anywhere; }
+.item .kcal { font-family: var(--font-num); font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
+.item .macro { grid-column: 2 / 4; font-family: var(--font-num); font-size: 12px; color: var(--ink-3); }
+.conf { font-size: 11px; border: 1px solid var(--rule); border-radius: 4px; padding: 0 5px; margin-left: 6px; color: var(--ink-3); font-family: var(--font-body); }
+.empty { color: var(--ink-3); font-size: 14px; padding: 8px 0; }
+
+/* add */
+.form { display: flex; flex-direction: column; gap: 12px; }
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field label { font-size: 12px; color: var(--ink-2); letter-spacing: .04em; }
+.field input, .field select, .field textarea { min-height: 44px; border: 1px solid var(--rule); border-radius: 8px; background: var(--bg); padding: 8px 10px; min-width: 0; width: 100%; }
+.field textarea { min-height: 64px; resize: vertical; }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.grid4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+@media (max-width: 520px) { .grid4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.drop { border: 1.5px dashed var(--rule); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; background: var(--bg); }
+.drop.over { border-color: var(--accent); background: var(--accent-soft); }
+.thumbs { display: flex; flex-wrap: wrap; gap: 8px; }
+.thumbs figure { margin: 0; position: relative; }
+.thumbs img { width: 84px; height: 84px; object-fit: cover; border-radius: 8px; display: block; }
+.thumbs button { position: absolute; top: -10px; right: -10px; width: 32px; height: 32px; border-radius: 50%; border: 0; background: var(--ink); color: var(--paper); font-size: 12px; line-height: 1; }
+.btn { min-height: 44px; border: 1px solid var(--ink); background: var(--ink); color: var(--paper); border-radius: 8px; padding: 9px 16px; font-weight: 700; font-size: 14px; }
+.btn.ghost { background: transparent; color: var(--ink); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.est { border-top: 1px solid var(--rule); padding-top: 14px; display: flex; flex-direction: column; gap: 12px; }
+.est table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.est th, .est td { padding: 6px 4px; border-bottom: 1px solid var(--rule); text-align: right; font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+.est th:first-child, .est td:first-child { text-align: left; font-family: var(--font-body); }
+.est td .note { display: block; color: var(--ink-3); font-size: 11px; }
+.tablewrap { overflow-x: auto; }
+.comment { font-size: 13px; background: var(--accent-soft); color: var(--ink); border-radius: 8px; padding: 8px 12px; }
+.thinking { font-size: 13px; color: var(--ink-2); }
+
+/* charts */
+.chart svg { width: 100%; height: auto; display: block; }
+.chart text { font-family: var(--font-num); font-size: 11px; fill: var(--ink-3); }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+.weeks { width: 100%; border-collapse: collapse; font-size: 13px; }
+.weeks th { font-weight: 500; color: var(--ink-3); font-size: 12px; text-align: right; padding: 6px 4px; border-bottom: 1px solid var(--rule); }
+.weeks th:first-child, .weeks td:first-child { text-align: left; }
+.weeks td { padding: 8px 4px; border-bottom: 1px solid var(--rule); text-align: right; font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+.rules { font-size: 12px; color: var(--ink-3); line-height: 1.7; }
+.rules summary { cursor: pointer; color: var(--ink-2); }
+.wrap { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
+.cfg { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 12px; margin: 0; font-size: 13px; }
+.cfg dt { color: var(--ink-2); padding: 6px 0; border-top: 1px solid var(--rule); }
+.cfg dd { margin: 0; padding: 6px 0; border-top: 1px solid var(--rule); text-align: right; font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+.cfg dt:first-of-type, .cfg dd:first-of-type { border-top: 0; }
+.cfg .src { color: var(--ink-3); font-family: var(--font-body); font-size: 11px; margin-left: 6px; }
+a { color: var(--accent); }
+.linkbtn { display: inline-flex; align-items: center; min-height: 44px; }
+.fab { position: fixed; z-index: 10; left: 50%; transform: translateX(-50%); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); min-height: 52px; padding: 0 26px; border-radius: 999px; border: 0; background: var(--accent); color: #fff; font-weight: 700; font-size: 16px; box-shadow: 0 6px 20px rgba(0,0,0,.22); max-width: calc(100vw - max(32px, env(safe-area-inset-left, 0px) + env(safe-area-inset-right, 0px) + 32px)); }
+:root[data-theme="dark"] .fab { color: #0f151b; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .fab { color: #0f151b; } }
+@media (prefers-reduced-motion: no-preference) { .fill { transition: width .4s ease; } html { scroll-behavior: smooth; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1>燃料帳</h1>
+      <p>食事ログ × Strava × Withings<span id="goalNote"></span></p>
+    </div>
+    <div class="datebar">
+      <button class="iconbtn" id="prevDay" aria-label="前の日">‹</button>
+      <input type="date" id="datePick" aria-label="日付">
+      <button class="iconbtn" id="nextDay" aria-label="次の日">›</button>
+      <button class="iconbtn" id="btnReload" aria-label="再読み込み">↻</button>
+    </div>
+  </header>
+
+  <div id="pageStatus" class="status err" hidden></div>
+
+  <section class="panel" aria-labelledby="h-day">
+    <div class="sec-head">
+      <h2 id="h-day">この日の収支</h2>
+      <div class="seg" role="group" aria-label="勤務形態">
+        <button id="dtOffice" aria-pressed="true">出社</button>
+        <button id="dtHome" aria-pressed="false">在宅</button>
+      </div>
+    </div>
+    <div class="ledger">
+      <div class="cell"><span class="lbl">摂取</span><span class="val" id="vIntake">—</span><span class="sub" id="sIntake">&nbsp;</span></div>
+      <span class="op">−</span>
+      <div class="cell"><span class="lbl">消費</span><span class="val" id="vBurn">—</span><span class="sub" id="sBurn">&nbsp;</span></div>
+      <span class="op">=</span>
+      <div class="cell result"><span class="lbl">収支</span><span class="val" id="vBal">—</span><span class="sub" id="sBal">&nbsp;</span></div>
+    </div>
+    <div id="dayPills" class="actions"></div>
+    <div class="meters" id="meters"></div>
+    <p class="remain" id="remain">記録を読み込んでいます。</p>
+  </section>
+
+  <section class="panel" aria-labelledby="h-meals">
+    <div class="sec-head">
+      <h2 id="h-meals">食事ログ</h2>
+      <span class="muted" id="mealsMeta"></span>
+    </div>
+    <div id="mealsStatus" class="status" hidden></div>
+    <div class="list" id="meals"><p class="empty">スプレッドシート「食事ログ」から、この日の記録を読み込みます。</p></div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-add">
+    <div class="sec-head">
+      <h2 id="h-add">食事を記録</h2>
+      <span class="muted">写真とメモからClaudeが推定し、確認してから書き込みます</span>
+    </div>
+    <div class="form">
+      <div class="grid2">
+        <div class="field">
+          <label for="fKubun">区分</label>
+          <select id="fKubun"><option>朝</option><option>昼</option><option>夕</option><option>間食</option><option>運動中</option></select>
+        </div>
+        <div class="field">
+          <label for="fDate">日付</label>
+          <input type="date" id="fDate">
+        </div>
+      </div>
+      <div class="drop" id="drop">
+        <label for="fPhotos" class="muted" id="photoLabel">写真を撮るかライブラリから選ぶ（複数可）</label>
+        <input type="file" id="fPhotos" accept="image/jpeg,image/png,image/webp,image/gif" multiple>
+        <div class="thumbs" id="thumbs"></div>
+      </div>
+      <div class="field">
+        <label for="fMemo">メモ（量や中身。例：ご飯は130g、揚げ物は鶏ささみ）</label>
+        <textarea id="fMemo" placeholder="ご飯130g、納豆、豚汁"></textarea>
+      </div>
+      <div class="actions">
+        <button class="btn" id="btnEstimate">推定する</button>
+        <button class="btn ghost" id="btnStop" hidden>止める</button>
+        <button class="btn ghost" id="btnManual">手入力する</button>
+        <span class="thinking" id="estStatus"></span>
+      </div>
+
+      <div class="est" id="est" hidden>
+        <div class="tablewrap" id="estItemsWrap"></div>
+        <div id="estComment" class="comment" hidden></div>
+        <div class="field">
+          <label for="eContent">内容（C列に入ります）</label>
+          <textarea id="eContent"></textarea>
+        </div>
+        <div class="grid4">
+          <div class="field"><label for="eKcal">kcal</label><input id="eKcal" type="number" inputmode="decimal" step="1"></div>
+          <div class="field"><label for="eP">たんぱく質 g</label><input id="eP" type="number" inputmode="decimal" step="0.1"></div>
+          <div class="field"><label for="eF">脂質 g</label><input id="eF" type="number" inputmode="decimal" step="0.1"></div>
+          <div class="field"><label for="eC">炭水化物 g</label><input id="eC" type="number" inputmode="decimal" step="0.1"></div>
+        </div>
+        <div class="grid2">
+          <div class="field">
+            <label for="eConf">確度</label>
+            <select id="eConf"><option>高</option><option selected>中</option><option>低</option></select>
+          </div>
+          <div class="field" style="justify-content:flex-end">
+            <div class="actions">
+              <button class="btn" id="btnSave">スプレッドシートに記録</button>
+              <button class="btn ghost" id="btnDiscard">取り消す</button>
+            </div>
+          </div>
+        </div>
+        <span class="thinking" id="saveStatus"></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-acts">
+    <div class="sec-head">
+      <h2 id="h-acts">運動（Strava）</h2>
+      <span class="muted">上乗せ＝安静時の分を差し引いた消費</span>
+    </div>
+    <div id="actsStatus" class="status" hidden></div>
+    <div class="list" id="acts"><p class="empty">Stravaからこの日の活動を読み込みます。</p></div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-trend">
+    <div class="sec-head">
+      <h2 id="h-trend">14日間の収支</h2>
+      <span class="muted" id="trendMeta"></span>
+    </div>
+    <div class="legend"><span><i style="background:var(--good)"></i>赤字（減量側）</span><span><i style="background:var(--warn)"></i>黒字</span><span><i style="background:var(--ink-3)"></i><span id="trendLegend">目標線</span></span></div>
+    <div class="chart" id="balChart"></div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-body" id="bodyPanel" hidden>
+    <div class="sec-head">
+      <h2 id="h-body">体重と体脂肪（Withings）</h2>
+      <span class="muted" id="bodyMeta"></span>
+    </div>
+    <div id="bodyStatus" class="status" hidden></div>
+    <div class="legend"><span><i style="background:var(--ink-3)"></i>毎朝の体重</span><span><i style="background:var(--accent)"></i>7日平均</span></div>
+    <div class="chart" id="wChart"></div>
+    <div class="tablewrap"><table class="weeks" id="weeks"></table></div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-nobody" id="noBodyPanel" hidden>
+    <h2 id="h-nobody">体重と体脂肪</h2>
+    <p class="muted" style="margin:0">スプレッドシートに「Withings」タブを作ると、体重の推移と週ごとの体脂肪量がここに出ます。体重と体脂肪率は基本消費の計算にも使われます。<a href="https://github.com/hirokitnk/fuel-ledger/blob/main/docs/withings-ifttt.md" target="_blank" rel="noopener">IFTTTで自動で入れる手順</a></p>
+  </section>
+
+  <section class="panel" aria-labelledby="h-cfg">
+    <div class="sec-head">
+      <h2 id="h-cfg">設定</h2>
+      <a class="linkbtn" id="sheetLink" href="#" target="_blank" rel="noopener">シートで編集する</a>
+    </div>
+    <div id="cfgStatus" class="status" hidden></div>
+    <dl class="cfg" id="cfgList"></dl>
+    <p class="muted" style="margin:0">値の変更はスプレッドシートの「設定」タブで行い、↻で読み込み直してください。</p>
+  </section>
+
+  <details class="rules">
+    <summary>計算のルール</summary>
+    <p>基本消費＝基礎代謝（Mifflin-St Jeor式）×活動係数（出社・在宅）を100 kcal単位に丸めたもの。「設定」タブに基本消費を入れればそちらを優先します。運動の上乗せは、ラン＝Stravaの値×0.93、スイム＝泳いでいた時間×8.5 kcal/分（METs換算）、Zwift＝×0.8、自転車＝×0.6、筋トレ＝×0.7、その他＝×0.7。摂取目標は消費−赤字目標。エネルギー利用可能量（摂取−運動の上乗せ）は除脂肪量×係数を下限とします。たんぱく質・炭水化物は体重あたり、脂質は上限で見ます。炭水化物は上乗せ400 kcal以上の日に多めの目標を使います。ナッツは吸収率を考慮して成分表の値から約15%差し引きます。</p>
+  </details>
+</div>
+
+<button class="fab" id="fab" type="button">＋ 記録</button>
+
+<script>
+// Pure calculation helpers (no DOM). Kept in their own script so they can be tested outside the page.
+const FuelCore = (() => {
+  const DEFAULTS = {
+    age: 40, sex: "male", height_cm: 170, weight_kg: 65, body_fat_pct: 20,
+    activity_office: 1.5, activity_home: 1.4, base_office_kcal: null, base_home_kcal: null,
+    deficit_kcal: 300, protein_g_per_kg: [1.8, 2.0], fat_max_g: 70,
+    carb_g_per_kg_easy: 4, carb_g_per_kg_hard: 5, ea_kcal_per_kg_ffm: 30, goal_note: "",
+    withings_col_date: "A", withings_col_weight: "B", withings_col_fat: "C",
+  };
+  const NUM_KEYS = ["age", "height_cm", "weight_kg", "body_fat_pct", "activity_office", "activity_home", "base_office_kcal", "base_home_kcal", "deficit_kcal", "fat_max_g", "carb_g_per_kg_easy", "carb_g_per_kg_hard", "ea_kcal_per_kg_ffm"];
+  const pad = (n) => String(n).padStart(2, "0");
+  const num = (v) => { const s = String(v ?? "").replace(/,/g, "").trim(); if (s === "") return null; const n = parseFloat(s); return isNaN(n) ? null : n; };
+  const colIdx = (letter) => { const s = String(letter || "").trim().toUpperCase(); if (!/^[A-Z]$/.test(s)) return -1; return s.charCodeAt(0) - 65; };
+
+  // rows: 設定!A1:H200 as returned by get_values. Keys in A, values in B; the product table starts at E with a 品名 header.
+  function parseSettings(rows) {
+    const cfg = { ...DEFAULTS, protein_g_per_kg: DEFAULTS.protein_g_per_kg.slice() };
+    const set = new Set();
+    const products = [];
+    let inProducts = false;
+    for (const r of rows || []) {
+      if (!Array.isArray(r)) continue;
+      const key = String(r[0] ?? "").trim();
+      const raw = r[1];
+      if (key && Object.prototype.hasOwnProperty.call(DEFAULTS, key) && String(raw ?? "").trim() !== "") {
+        if (NUM_KEYS.includes(key)) { const n = num(raw); if (n != null && n > 0) { cfg[key] = n; set.add(key); } }
+        else if (key === "protein_g_per_kg") {
+          const m = String(raw).replace(/[〜~–—]/g, "-").split("-").map(num).filter((x) => x != null && x > 0);
+          if (m.length) { cfg[key] = [m[0], m[1] ?? m[0]]; set.add(key); }
+        } else if (key === "sex") { const v = String(raw).trim().toLowerCase(); if (v === "male" || v === "female") { cfg.sex = v; set.add(key); } else if (/^(女|f)/.test(v)) { cfg.sex = "female"; set.add(key); } else if (/^(男|m)/.test(v)) { cfg.sex = "male"; set.add(key); } }
+        else { cfg[key] = String(raw).trim(); set.add(key); }
+      }
+      const name = String(r[4] ?? "").trim();
+      if (name === "品名") { inProducts = true; continue; }
+      if (inProducts && name) products.push({ name, amount: String(r[5] ?? "").trim(), kcal: num(r[6]), protein: num(r[7]), fat: num(r[8]), carbs: num(r[9]) });
+    }
+    return { cfg, set, products };
+  }
+
+  const MONTHS = { january: 1, february: 2, march: 3, april: 4, may: 5, june: 6, july: 7, august: 8, september: 9, october: 10, november: 11, december: 12 };
+  // Accepts "2026-01-15 07:30", "2026/01/15", and IFTTT's "January 15, 2026 at 07:30AM". Returns YYYY-MM-DD or null.
+  function parseDay(v) {
+    const s = String(v ?? "").trim();
+    let m = s.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+    if (m) return m[1] + "-" + pad(+m[2]) + "-" + pad(+m[3]);
+    m = s.match(/^([A-Za-z]+)\.?\s+(\d{1,2}),?\s+(\d{4})/);
+    if (m && MONTHS[m[1].toLowerCase()]) return m[3] + "-" + pad(MONTHS[m[1].toLowerCase()]) + "-" + pad(+m[2]);
+    return null;
+  }
+
+  // rows: Withings!A1:H5000. Header rows and unparsable rows are skipped. Pounds are converted when any cell in the row says lb/lbs.
+  function parseWithings(rows, cfg) {
+    const c = cfg || DEFAULTS;
+    const iD = colIdx(c.withings_col_date), iW = colIdx(c.withings_col_weight), iF = colIdx(c.withings_col_fat);
+    const byDay = {};
+    for (const r of rows || []) {
+      if (!Array.isArray(r) || iD < 0 || iW < 0) continue;
+      const d = parseDay(r[iD]);
+      let w = num(r[iW]);
+      if (!d || w == null || w <= 0) continue;
+      const lb = r.some((x) => /^lbs?$/i.test(String(x ?? "").trim()));
+      if (lb) w = w * 0.45359237;
+      let bf = iF >= 0 ? num(r[iF]) : null;
+      if (bf != null && (bf <= 0 || bf >= 70)) bf = null;
+      byDay[d] = { w: Math.round(w * 100) / 100, bf }; // the last measurement of a day wins
+    }
+    return byDay;
+  }
+
+  function avgRecent(byDay, endDay, days) {
+    const out = { w: null, bf: null, n: 0 };
+    const [y, m, d] = endDay.split("-").map(Number);
+    const ws = [], bfs = [];
+    for (let i = 0; i < days; i++) {
+      const dt = new Date(y, m - 1, d - i);
+      const k = dt.getFullYear() + "-" + pad(dt.getMonth() + 1) + "-" + pad(dt.getDate());
+      if (byDay[k]) { ws.push(byDay[k].w); if (byDay[k].bf != null) bfs.push(byDay[k].bf); }
+    }
+    if (ws.length) { out.w = ws.reduce((a, b) => a + b, 0) / ws.length; out.n = ws.length; }
+    if (bfs.length) out.bf = bfs.reduce((a, b) => a + b, 0) / bfs.length;
+    return out;
+  }
+
+  const bmr = (c) => 10 * c.weight_kg + 6.25 * c.height_cm - 5 * c.age + (c.sex === "female" ? -161 : 5);
+
+  // body: optional {w, bf} from recent Withings averages, which override weight_kg / body_fat_pct.
+  function targets(cfg, body) {
+    const c = { ...cfg };
+    const src = { weight: "設定", bf: "設定" };
+    if (body && body.w) { c.weight_kg = body.w; src.weight = "Withings 7日平均"; }
+    if (body && body.bf) { c.body_fat_pct = body.bf; src.bf = "Withings 7日平均"; }
+    const b = bmr(c);
+    const auto = { office: Math.round(b * c.activity_office / 100) * 100, home: Math.round(b * c.activity_home / 100) * 100 };
+    const base = { office: c.base_office_kcal || auto.office, home: c.base_home_kcal || auto.home };
+    const ffm = c.weight_kg * (1 - c.body_fat_pct / 100);
+    return {
+      weight: c.weight_kg, bf: c.body_fat_pct, src, bmr: b, auto, base,
+      baseSrc: { office: c.base_office_kcal ? "設定で上書き" : "自動計算", home: c.base_home_kcal ? "設定で上書き" : "自動計算" },
+      ffm, eaFloor: Math.round(ffm * c.ea_kcal_per_kg_ffm / 10) * 10, deficit: c.deficit_kcal,
+      protein: [Math.round(c.weight_kg * c.protein_g_per_kg[0]), Math.round(c.weight_kg * c.protein_g_per_kg[1])],
+      fatMax: c.fat_max_g,
+      carb: { easy: Math.round(c.weight_kg * c.carb_g_per_kg_easy / 5) * 5, hard: Math.round(c.weight_kg * c.carb_g_per_kg_hard / 5) * 5 },
+    };
+  }
+
+  return { DEFAULTS, parseSettings, parseDay, parseWithings, avgRecent, bmr, targets };
+})();
+</script>
+<script>
+(() => {
+  const SPREADSHEET_ID = "__SPREADSHEET_ID__";
+  const SHEETS = "Google Sheets";
+  const STRAVA = "Strava";
+  const CONFIGURED = /^[A-Za-z0-9_-]{20,}$/.test(SPREADSHEET_ID);
+
+  const $ = (id) => document.getElementById(id);
+  const fmt = (n) => (n == null || isNaN(n)) ? "—" : Math.round(n).toLocaleString("ja-JP");
+  const fmt1 = (n) => (n == null || isNaN(n)) ? "—" : (Math.round(n * 10) / 10).toLocaleString("ja-JP");
+  const signed = (n) => (n > 0 ? "+" : n < 0 ? "−" : "±") + Math.abs(Math.round(n)).toLocaleString("ja-JP");
+  const pad = (n) => String(n).padStart(2, "0");
+  const ymd = (d) => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+  const parseYmd = (s) => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+  const addDays = (s, n) => { const d = parseYmd(s); d.setDate(d.getDate() + n); return ymd(d); };
+  const md = (s) => { const d = parseYmd(s); return (d.getMonth() + 1) + "/" + d.getDate(); };
+  const wd = (s) => "日月火水木金土"[parseYmd(s).getDay()];
+  const toNum = (v) => { const n = parseFloat(String(v ?? "").replace(/,/g, "")); return isNaN(n) ? 0 : n; };
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  const store = {
+    get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+  };
+
+  const state = {
+    date: ymd(new Date()),
+    meals: null,       // rows from 食事ログ
+    acts: {},          // date -> activities
+    actsRange: null,   // [start, end] loaded
+    withingsRows: null,
+    body: null,        // date -> {w, bf}
+    settings: FuelCore.parseSettings([]),
+    settingsLoaded: false,
+    files: [],
+    mcp: null,
+    sample: null,
+    canImages: false,
+  };
+
+  // Targets use the latest Withings 7-day average (ending today), not the viewed date.
+  function T() {
+    const recent = state.body ? FuelCore.avgRecent(state.body, ymd(new Date()), 7) : null;
+    return FuelCore.targets(state.settings.cfg, recent);
+  }
+
+  function dayType(date) {
+    const saved = store.get("daytype:" + date);
+    if (saved === "office" || saved === "home") return saved;
+    const w = parseYmd(date).getDay();
+    return (w === 0 || w === 6) ? "home" : "office";
+  }
+
+  function adjOf(a) {
+    const s = a.summary || {};
+    const kcal = toNum(s.total_calories);
+    const t = a.sport_type || "";
+    if (t === "Swim") return { v: toNum(s.moving_time) / 60 * 8.5, rule: "泳いだ時間×8.5" };
+    if (t === "Run" || t === "TrailRun" || t === "VirtualRun") return { v: kcal * 0.93, rule: "×0.93" };
+    if (t === "VirtualRide") return { v: kcal * 0.8, rule: "×0.8" };
+    if (t === "Ride" || t === "EBikeRide") return { v: kcal * 0.6, rule: "×0.6" };
+    if (t === "WeightTraining") return { v: kcal * 0.7, rule: "×0.7" };
+    return { v: kcal * 0.7, rule: "×0.7" };
+  }
+
+  const SPORT_JA = { Run: "ラン", TrailRun: "トレイル", VirtualRun: "ラン（室内）", Swim: "スイム", Ride: "自転車", EBikeRide: "自転車", VirtualRide: "Zwift", WeightTraining: "筋トレ", Walk: "ウォーク", Hike: "ハイク", Workout: "ワークアウト" };
+
+  function mealsOn(date) {
+    if (!state.meals) return [];
+    return state.meals.filter((r) => String(r[0]).trim() === date);
+  }
+
+  function calc(date) {
+    const t = T();
+    const rows = mealsOn(date);
+    const intake = rows.reduce((a, r) => ({ k: a.k + toNum(r[3]), p: a.p + toNum(r[4]), f: a.f + toNum(r[5]), c: a.c + toNum(r[6]) }), { k: 0, p: 0, f: 0, c: 0 });
+    const acts = state.acts[date] || [];
+    const extra = acts.reduce((s, a) => s + adjOf(a).v, 0);
+    const type = dayType(date);
+    const burn = t.base[type] + extra;
+    return { t, rows, intake, acts, extra, type, burn, bal: intake.k - burn, ea: intake.k - extra, target: burn - t.deficit, carbTarget: extra >= 400 ? t.carb.hard : t.carb.easy, actsKnown: !!state.actsRange && date >= state.actsRange[0] && date <= state.actsRange[1] };
+  }
+
+  // ---------- errors ----------
+  function mcpCopy(e, server) {
+    const code = e && e.code;
+    switch (code) {
+      case "needs_reauth": return server + "の接続が切れています。claude.aiの設定 → コネクタで再接続してください。";
+      case "server_not_connected": return server + "が接続されていません。claude.aiの設定 → コネクタで追加してください。";
+      case "selection_required": return server + "の接続が複数あります。表示される画面でどれを使うか選んでください。";
+      case "not_in_manifest": return server + "の利用がこのページで許可されていません。ページのメニュー「権限」から許可できます。";
+      case "approval_required": return server + "の利用にはあなたの許可が必要です。";
+      case "blocked_by_policy": return "組織の設定により、" + server + "はこのページから使えません。";
+      case "server_unavailable": return server + "に一時的につながりません。少し待ってから再読み込みしてください。";
+      case "tool_error": return server + "がエラーを返しました：" + String(e.message || "").slice(0, 140);
+      case "not_granted": case "capability_disabled": case "capability_removed": return "このビューではコネクタを使えません。claude.aiでこのページを開いてください。";
+      default: return server + "を読み込めませんでした（" + (code || "不明") + "）。再読み込みしてください。";
+    }
+  }
+  function showStatus(el, msg, isErr, retry) {
+    el.hidden = false;
+    el.className = "status" + (isErr ? " err" : "");
+    el.textContent = msg;
+    if (retry) {
+      const b = document.createElement("button");
+      b.textContent = retry.label;
+      b.onclick = retry.fn;
+      el.append(b);
+    }
+  }
+  const hideStatus = (el) => { el.hidden = true; el.textContent = ""; };
+  const isMissingSheet = (e) => e && e.code === "tool_error" && /unable to parse range|not found|範囲/i.test(String(e.message || ""));
+
+  function payloadOf(res) {
+    let p = res && res.payload;
+    if (typeof p === "string") { try { p = JSON.parse(p); } catch {} }
+    return p;
+  }
+  async function getValues(range) {
+    const res = await state.mcp.callTool(SHEETS, "get_values", { spreadsheetId: SPREADSHEET_ID, range }, { cache: false });
+    const p = payloadOf(res);
+    return (p && Array.isArray(p.values)) ? p.values : [];
+  }
+
+  // ---------- loaders ----------
+  async function loadSettings() {
+    if (!state.mcp) return;
+    try {
+      state.settings = FuelCore.parseSettings(await getValues("設定!A1:J200"));
+      state.settingsLoaded = true;
+      if (!state.settings.set.size) showStatus($("cfgStatus"), "「設定」タブに値がないため、既定値で計算しています。", false);
+      else hideStatus($("cfgStatus"));
+    } catch (e) {
+      state.settings = FuelCore.parseSettings([]);
+      showStatus($("cfgStatus"), isMissingSheet(e) ? "「設定」タブがないため、既定値で計算しています。" : "設定を読めなかったため、既定値で計算しています。" + mcpCopy(e, SHEETS), false);
+    }
+  }
+
+  async function loadMeals() {
+    if (!state.mcp) return;
+    try {
+      state.meals = (await getValues("食事ログ!A2:H5000")).filter((r) => r && r[0]);
+      hideStatus($("mealsStatus"));
+    } catch (e) {
+      if (e && e.code === "approval_required") showStatus($("mealsStatus"), mcpCopy(e, SHEETS), true, { label: "許可する", fn: refreshAll });
+      else showStatus($("mealsStatus"), mcpCopy(e, SHEETS), true, (e && e.retryable) ? { label: "もう一度", fn: refreshAll } : null);
+    }
+  }
+
+  async function loadWithings() {
+    if (!state.mcp) return;
+    try {
+      state.withingsRows = await getValues("Withings!A1:H5000");
+      hideStatus($("bodyStatus"));
+    } catch (e) {
+      state.withingsRows = [];
+      if (!isMissingSheet(e)) showStatus($("bodyStatus"), mcpCopy(e, SHEETS), true);
+    }
+  }
+
+  async function loadActs(endDate) {
+    if (!state.mcp) return;
+    const start = addDays(endDate, -13);
+    try {
+      const res = await state.mcp.callTool(STRAVA, "list_activities", { first: 50, range_start: start + "T00:00:00", range_end: endDate + "T23:59:59" }, { cache: false });
+      const p = payloadOf(res);
+      const list = (p && Array.isArray(p.activities)) ? p.activities : [];
+      for (let d = start; d <= endDate; d = addDays(d, 1)) state.acts[d] = [];
+      for (const a of list) {
+        const d = String(a.start_local || "").slice(0, 10);
+        if (state.acts[d]) state.acts[d].push(a);
+      }
+      for (const d in state.acts) state.acts[d].sort((x, y) => String(x.start_local).localeCompare(String(y.start_local)));
+      state.actsRange = [start, endDate];
+      hideStatus($("actsStatus"));
+    } catch (e) {
+      showStatus($("actsStatus"), mcpCopy(e, STRAVA), true, (e && (e.retryable || e.code === "approval_required")) ? { label: "もう一度", fn: refreshAll } : null);
+    }
+  }
+
+  let loading = false;
+  async function refreshAll() {
+    if (loading || !state.mcp || !CONFIGURED) return;
+    loading = true;
+    $("mealsMeta").textContent = "読み込み中…";
+    await Promise.all([loadSettings(), loadMeals(), loadActs(state.date), loadWithings()]);
+    // Withings columns can be remapped in 設定, so parse after both are in.
+    state.body = state.withingsRows ? FuelCore.parseWithings(state.withingsRows, state.settings.cfg) : null;
+    loading = false;
+    $("mealsMeta").textContent = "最終更新 " + new Date().toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" });
+    renderAll();
+  }
+
+  // ---------- render ----------
+  function meter(label, value, unit, opts) {
+    const max = opts.scale;
+    const pct = Math.min(100, value / max * 100);
+    let band = "";
+    if (opts.lo != null && opts.hi != null) band = '<span class="band" style="left:' + (opts.lo / max * 100) + '%;width:' + ((opts.hi - opts.lo) / max * 100) + '%"></span>';
+    else if (opts.mark != null) band = '<span class="tick" style="left:calc(' + Math.min(100, opts.mark / max * 100) + '% - 1px)"></span>';
+    return '<div class="meter"><div class="row"><span>' + label + '</span><span class="num">' + fmt1(value) + ' / ' + opts.targetText + ' ' + unit + '</span></div>' +
+      '<div class="track" role="img" aria-label="' + label + ' ' + fmt1(value) + unit + '"><span class="fill ' + (opts.tone || "") + '" style="width:' + pct + '%"></span>' + band + '</div></div>';
+  }
+
+  function renderHeader() {
+    const g = String(state.settings.cfg.goal_note || "").trim();
+    $("goalNote").textContent = g ? " — " + g : "";
+  }
+
+  function renderDay() {
+    const c = calc(state.date);
+    const t = c.t;
+    $("dtOffice").setAttribute("aria-pressed", String(c.type === "office"));
+    $("dtHome").setAttribute("aria-pressed", String(c.type === "home"));
+    const haveMeals = !!state.meals;
+    $("vIntake").textContent = haveMeals ? fmt(c.intake.k) : "—";
+    $("sIntake").textContent = haveMeals ? c.rows.length + "件" : "未読込";
+    $("vBurn").textContent = fmt(c.burn);
+    $("sBurn").textContent = "基本" + fmt(t.base[c.type]) + " + 運動" + (c.actsKnown ? fmt(c.extra) : "?");
+    const balEl = $("vBal");
+    balEl.textContent = haveMeals ? signed(c.bal) : "—";
+    balEl.className = "val " + (!haveMeals ? "" : c.bal <= -t.deficit / 2 ? "good" : c.bal <= t.deficit / 2 ? "warn" : "bad");
+    $("sBal").textContent = "目標 −" + fmt(t.deficit) + "（摂取" + fmt(c.target) + "）";
+
+    const pills = [];
+    if (haveMeals && c.rows.length) {
+      const eaTone = c.ea >= t.eaFloor ? "good" : c.ea >= t.eaFloor - 150 ? "warn" : "bad";
+      pills.push('<span class="pill ' + eaTone + '">利用可能量 ' + fmt(c.ea) + ' / 下限 ' + fmt(t.eaFloor) + '</span>');
+      const fatPct = c.intake.k > 0 ? c.intake.f * 9 / c.intake.k * 100 : 0;
+      pills.push('<span class="pill ' + (fatPct <= 30 ? "good" : fatPct <= 35 ? "warn" : "bad") + '">脂質比 ' + Math.round(fatPct) + '%</span>');
+    }
+    pills.push('<span class="pill">' + (c.type === "office" ? "出社日" : "在宅日") + '・' + md(state.date) + '（' + wd(state.date) + '）</span>');
+    $("dayPills").innerHTML = pills.join("");
+
+    const [pLo, pHi] = t.protein;
+    $("meters").innerHTML = [
+      meter("エネルギー", c.intake.k, "kcal", { scale: Math.max(c.target * 1.25, c.intake.k), mark: c.target, targetText: fmt(c.target), tone: c.intake.k > c.target + 150 ? "bad" : c.ea < t.eaFloor && c.rows.length ? "warn" : "good" }),
+      meter("たんぱく質", c.intake.p, "g", { scale: Math.max(pHi * 1.2, c.intake.p), lo: pLo, hi: pHi, targetText: pLo + "〜" + pHi, tone: c.intake.p >= pLo ? "good" : "" }),
+      meter("脂質", c.intake.f, "g", { scale: Math.max(t.fatMax * 1.4, c.intake.f), mark: t.fatMax, targetText: "≤" + fmt(t.fatMax), tone: c.intake.f > t.fatMax ? "bad" : c.intake.f > t.fatMax * 0.8 ? "warn" : "good" }),
+      meter("炭水化物", c.intake.c, "g", { scale: Math.max(c.carbTarget * 1.3, c.intake.c), mark: c.carbTarget, targetText: String(c.carbTarget), tone: c.intake.c >= c.carbTarget ? "good" : "" }),
+    ].join("");
+
+    const r = $("remain");
+    if (!haveMeals) { r.textContent = !CONFIGURED ? "スプレッドシートが設定されていません。" : state.mcp ? "食事ログを読み込んでいます。" : "このページはclaude.aiで開くと、スプレッドシートとStravaにつながります。"; return; }
+    const leftK = c.target - c.intake.k;
+    const leftP = Math.max(0, pLo - c.intake.p);
+    const leftF = Math.max(0, t.fatMax - c.intake.f);
+    const leftC = Math.max(0, c.carbTarget - c.intake.c);
+    const minK = t.eaFloor + c.extra - c.intake.k;
+    let html = leftK > 0
+      ? '残り <strong>' + fmt(leftK) + ' kcal</strong>（たんぱく質 ' + fmt(leftP) + ' g・炭水化物 ' + fmt(leftC) + ' g・脂質は ' + fmt(leftF) + ' g まで）。'
+      : '目標を <strong>' + fmt(-leftK) + ' kcal</strong> 超えています。今日はこれ以上は控えめに。';
+    if (minK > 0 && leftK > 0) html += ' 利用可能量の下限を守るには、最低でもあと <strong>' + fmt(minK) + ' kcal</strong>。';
+    if (!c.actsKnown) html += ' Stravaの記録は未取得です。';
+    r.innerHTML = html;
+  }
+
+  function renderMeals() {
+    const box = $("meals");
+    if (!state.meals) return;
+    const rows = mealsOn(state.date);
+    if (!rows.length) { box.innerHTML = '<p class="empty">' + md(state.date) + 'の記録はまだありません。下の「食事を記録」から追加できます。</p>'; return; }
+    box.innerHTML = rows.map((r) =>
+      '<div class="item"><span class="kubun">' + esc(r[1]) + '</span><span class="desc">' + esc(r[2]) + (r[7] ? '<span class="conf">' + esc(r[7]) + '</span>' : '') + '</span>' +
+      '<span class="kcal">' + fmt(toNum(r[3])) + '</span>' +
+      '<span class="macro">P ' + fmt1(toNum(r[4])) + ' ・ F ' + fmt1(toNum(r[5])) + ' ・ C ' + fmt1(toNum(r[6])) + '</span></div>'
+    ).join("");
+  }
+
+  function renderActs() {
+    const box = $("acts");
+    if (!state.actsRange) return;
+    const c = calc(state.date);
+    if (!c.actsKnown) { box.innerHTML = '<p class="empty">この日はまだ読み込んでいません。</p>'; return; }
+    if (!c.acts.length) { box.innerHTML = '<p class="empty">この日の活動はありません。</p>'; return; }
+    box.innerHTML = c.acts.map((a) => {
+      const s = a.summary || {};
+      const adj = adjOf(a);
+      const km = toNum(s.distance) / 1000;
+      const min = toNum(s.moving_time) / 60;
+      let detail = (km > 0 ? fmt1(km) + " km・" : "") + Math.round(min) + "分";
+      if ((a.sport_type === "Run" || a.sport_type === "TrailRun") && km > 0) { const p = min / km; detail += "・" + Math.floor(p) + ":" + pad(Math.round((p % 1) * 60)) + "/km"; }
+      if (a.sport_type === "Swim" && km > 0) { const p = min / (km * 10); detail += "・" + Math.floor(p) + ":" + pad(Math.round((p % 1) * 60)) + "/100m"; }
+      return '<div class="item"><span class="kubun">' + esc(String(a.start_local || "").slice(11, 16)) + '</span>' +
+        '<span class="desc">' + esc(SPORT_JA[a.sport_type] || a.sport_type) + '　' + esc(a.name || "") + '</span>' +
+        '<span class="kcal">+' + fmt(adj.v) + '</span>' +
+        '<span class="macro">' + detail + '・Strava ' + fmt(toNum(s.total_calories)) + ' kcal（' + adj.rule + '）</span></div>';
+    }).join("") + '<div class="item"><span class="kubun">合計</span><span class="desc">運動の上乗せ</span><span class="kcal">+' + fmt(c.extra) + '</span></div>';
+  }
+
+  function renderTrend() {
+    const box = $("balChart");
+    const deficit = T().deficit;
+    $("trendLegend").textContent = "−" + fmt(deficit) + " kcalの目標線";
+    if (!state.meals || !state.actsRange) { box.innerHTML = '<p class="empty">食事ログとStravaを読み込むと表示されます。</p>'; return; }
+    const days = [];
+    for (let i = 13; i >= 0; i--) days.push(addDays(state.date, -i));
+    const data = days.map((d) => { const c = calc(d); return { d, has: c.rows.length > 0 && c.actsKnown, bal: c.bal }; });
+    const vals = data.filter((x) => x.has).map((x) => x.bal);
+    const sum = vals.reduce((a, b) => a + b, 0);
+    $("trendMeta").textContent = vals.length ? vals.length + "日分の合計 " + signed(sum) + " kcal・平均 " + signed(sum / vals.length) + "/日" : "";
+    const W = 700, H = 230, L = 44, R = 8, T0 = 14, B = 30;
+    const ext = Math.max(600, ...vals.map(Math.abs)) * 1.1;
+    const y = (v) => T0 + (ext - v) / (2 * ext) * (H - T0 - B);
+    const bw = (W - L - R) / days.length;
+    const step = ext > 1500 ? 1000 : 500;
+    let g = "";
+    for (let v = -Math.floor(ext / step) * step; v <= ext; v += step) {
+      g += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(v) + '" y2="' + y(v) + '" stroke="var(--rule)" stroke-width="1"/>';
+      g += '<text x="' + (L - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end">' + (v > 0 ? "+" : "") + v + '</text>';
+    }
+    g += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(-deficit) + '" y2="' + y(-deficit) + '" stroke="var(--ink-3)" stroke-dasharray="4 4" stroke-width="1.2"/>';
+    g += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(0) + '" y2="' + y(0) + '" stroke="var(--ink-2)" stroke-width="1"/>';
+    data.forEach((x, i) => {
+      const cx = L + i * bw + bw / 2;
+      if (x.has) {
+        const y0 = y(0), y1 = y(x.bal);
+        const top = Math.min(y0, y1), h = Math.max(1, Math.abs(y1 - y0));
+        g += '<rect x="' + (cx - Math.min(18, bw * 0.6) / 2) + '" y="' + top + '" width="' + Math.min(18, bw * 0.6) + '" height="' + h + '" rx="3" fill="' + (x.bal < 0 ? "var(--good)" : "var(--warn)") + '"><title>' + md(x.d) + " " + signed(x.bal) + ' kcal</title></rect>';
+      } else {
+        g += '<circle cx="' + cx + '" cy="' + y(0) + '" r="2" fill="var(--ink-3)"/>';
+      }
+      if (i % 2 === (days.length - 1) % 2) g += '<text x="' + cx + '" y="' + (H - 10) + '" text-anchor="middle"' + (x.d === state.date ? ' style="fill:var(--ink);font-weight:600"' : '') + '>' + md(x.d) + '</text>';
+    });
+    box.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="14日間の日別収支">' + g + '</svg>';
+  }
+
+  function renderBody() {
+    const byDay = state.body;
+    const has = !!byDay && Object.keys(byDay).length > 0;
+    $("bodyPanel").hidden = !has && $("bodyStatus").hidden;
+    $("noBodyPanel").hidden = has || !state.withingsRows || !$("bodyStatus").hidden;
+    if (!has) return;
+    const box = $("wChart");
+    const end = state.date;
+    const start = addDays(end, -41);
+    const days = [];
+    for (let d = start; d <= end; d = addDays(d, 1)) days.push(d);
+    const pts = days.map((d, i) => ({ d, i, w: byDay[d] ? byDay[d].w : null }));
+    const withW = pts.filter((p) => p.w);
+    if (!withW.length) { box.innerHTML = '<p class="empty">この期間の計測がありません。</p>'; $("weeks").innerHTML = ""; $("bodyMeta").textContent = ""; return; }
+    const avg = pts.map((p) => { const win = pts.slice(Math.max(0, p.i - 6), p.i + 1).filter((q) => q.w); return win.length >= 3 ? win.reduce((s, q) => s + q.w, 0) / win.length : null; });
+    const ws = withW.map((p) => p.w);
+    const lo = Math.floor(Math.min(...ws) - 0.3), hi = Math.ceil(Math.max(...ws) + 0.3);
+    const W = 700, H = 220, L = 40, R = 10, T0 = 12, B = 28;
+    const x = (i) => L + i / (days.length - 1) * (W - L - R);
+    const y = (v) => T0 + (hi - v) / (hi - lo) * (H - T0 - B);
+    let g = "";
+    for (let v = lo; v <= hi; v += 1) { g += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(v) + '" y2="' + y(v) + '" stroke="var(--rule)"/><text x="' + (L - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end">' + v + '</text>'; }
+    withW.forEach((p) => { g += '<circle cx="' + x(p.i) + '" cy="' + y(p.w) + '" r="3" fill="var(--ink-3)"><title>' + md(p.d) + " " + p.w + ' kg</title></circle>'; });
+    let path = "";
+    avg.forEach((v, i) => { if (v == null) return; path += (path ? "L" : "M") + x(i).toFixed(1) + " " + y(v).toFixed(1); });
+    if (path) g += '<path d="' + path + '" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>';
+    const lastAvgIdx = avg.map((v, i) => v != null ? i : -1).filter((i) => i >= 0).pop();
+    if (lastAvgIdx != null) g += '<circle cx="' + x(lastAvgIdx) + '" cy="' + y(avg[lastAvgIdx]) + '" r="4.5" fill="var(--accent)" stroke="var(--paper)" stroke-width="2"/>';
+    days.forEach((d, i) => { if (i % 7 === (days.length - 1) % 7) g += '<text x="' + x(i) + '" y="' + (H - 8) + '" text-anchor="middle">' + md(d) + '</text>'; });
+    box.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="体重の推移と7日平均">' + g + '</svg>';
+    $("bodyMeta").textContent = lastAvgIdx != null ? "7日平均 " + fmt1(avg[lastAvgIdx]) + " kg" : "";
+
+    const weeks = [];
+    for (let k = 0; k < 6; k++) {
+      const wEnd = addDays(end, -7 * k), wStart = addDays(wEnd, -6);
+      const rows = []; for (let d = wStart; d <= wEnd; d = addDays(d, 1)) if (byDay[d]) rows.push(byDay[d]);
+      if (!rows.length) continue;
+      const aw = rows.reduce((s, r) => s + r.w, 0) / rows.length;
+      const bfRows = rows.filter((r) => r.bf > 0);
+      const abf = bfRows.length ? bfRows.reduce((s, r) => s + r.bf, 0) / bfRows.length : null;
+      weeks.push({ label: md(wStart) + "〜" + md(wEnd), n: rows.length, aw, abf, fat: abf != null ? aw * abf / 100 : null });
+    }
+    $("weeks").innerHTML = '<thead><tr><th>7日間</th><th>回数</th><th>平均体重</th><th>体脂肪率</th><th>体脂肪量</th></tr></thead><tbody>' +
+      weeks.map((w) => '<tr><td>' + w.label + '</td><td>' + w.n + '</td><td>' + fmt1(w.aw) + ' kg</td><td>' + (w.abf != null ? fmt1(w.abf) + '%' : '—') + '</td><td>' + (w.fat != null ? fmt1(w.fat) + ' kg' : '—') + '</td></tr>').join("") + '</tbody>';
+  }
+
+  function renderSettings() {
+    const t = T();
+    const c = state.settings.cfg;
+    const src = (s) => '<span class="src">' + esc(s) + '</span>';
+    const rows = [
+      ["体重", fmt1(t.weight) + " kg" + src(t.src.weight)],
+      ["体脂肪率", fmt1(t.bf) + "%" + src(t.src.bf)],
+      ["基礎代謝（Mifflin-St Jeor）", fmt(t.bmr) + " kcal"],
+      ["基本消費・出社日", fmt(t.base.office) + " kcal" + src(t.baseSrc.office)],
+      ["基本消費・在宅日", fmt(t.base.home) + " kcal" + src(t.baseSrc.home)],
+      ["1日の赤字目標", fmt(t.deficit) + " kcal"],
+      ["利用可能量の下限", fmt(t.eaFloor) + " kcal" + src("除脂肪量" + fmt1(t.ffm) + "kg×" + c.ea_kcal_per_kg_ffm)],
+      ["たんぱく質", t.protein[0] + "〜" + t.protein[1] + " g"],
+      ["脂質の上限", fmt(t.fatMax) + " g"],
+      ["炭水化物", t.carb.easy + " g" + src("上乗せ400kcal以上の日は" + t.carb.hard + " g")],
+      ["よく食べる市販品", state.settings.products.length + "品"],
+    ];
+    $("cfgList").innerHTML = rows.map(([k, v]) => '<dt>' + esc(k) + '</dt><dd>' + v + '</dd>').join("");
+  }
+
+  function renderAll() { renderHeader(); renderDay(); renderMeals(); renderActs(); renderTrend(); renderBody(); renderSettings(); }
+
+  // ---------- date controls ----------
+  function setDate(d) {
+    if (!d) return;
+    state.date = d;
+    $("datePick").value = d;
+    $("fDate").value = d;
+    renderAll();
+    if (state.mcp && CONFIGURED && (!state.actsRange || d > state.actsRange[1] || addDays(d, -13) < state.actsRange[0])) {
+      loadActs(d).then(renderAll);
+    }
+  }
+  $("prevDay").onclick = () => setDate(addDays(state.date, -1));
+  $("nextDay").onclick = () => setDate(addDays(state.date, 1));
+  $("datePick").onchange = (e) => setDate(e.target.value);
+  $("btnReload").onclick = () => refreshAll();
+  $("dtOffice").onclick = () => { store.set("daytype:" + state.date, "office"); renderAll(); };
+  $("dtHome").onclick = () => { store.set("daytype:" + state.date, "home"); renderAll(); };
+
+  // ---------- floating record button ----------
+  const addPanel = $("h-add").closest("section");
+  $("fab").onclick = () => {
+    addPanel.scrollIntoView({ block: "start" });
+    $("fKubun").focus({ preventScroll: true });
+  };
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver((entries) => { for (const e of entries) $("fab").hidden = e.isIntersecting; }, { threshold: 0.15 }).observe(addPanel);
+  }
+
+  // ---------- photos ----------
+  function setFiles(list) {
+    for (const f of list) if (f.type.startsWith("image/") && state.files.length < 6) state.files.push(f);
+    renderThumbs();
+  }
+  function renderThumbs() {
+    const box = $("thumbs");
+    box.innerHTML = "";
+    state.files.forEach((f, i) => {
+      const fig = document.createElement("figure");
+      const img = document.createElement("img");
+      img.src = URL.createObjectURL(f); img.alt = "食事の写真 " + (i + 1);
+      const x = document.createElement("button"); x.textContent = "×"; x.setAttribute("aria-label", "写真を外す");
+      x.onclick = () => { state.files.splice(i, 1); renderThumbs(); };
+      fig.append(img, x); box.append(fig);
+    });
+  }
+  $("fPhotos").onchange = (e) => { setFiles(e.target.files); e.target.value = ""; };
+  const drop = $("drop");
+  drop.addEventListener("dragover", (e) => { e.preventDefault(); drop.classList.add("over"); });
+  drop.addEventListener("dragleave", () => drop.classList.remove("over"));
+  drop.addEventListener("drop", (e) => { e.preventDefault(); drop.classList.remove("over"); if (e.dataTransfer && e.dataTransfer.files) setFiles(e.dataTransfer.files); });
+
+  // ---------- estimate ----------
+  let ctl = null;
+  let lastItems = [];
+  function profileText() {
+    const c = state.settings.cfg;
+    const t = T();
+    let s = "利用者は" + Math.round(c.age) + "歳" + (c.sex === "female" ? "女性" : "男性") + "・身長約" + Math.round(c.height_cm) + "cm・体重約" + Math.round(t.weight) + "kg";
+    const g = String(c.goal_note || "").trim();
+    s += g ? "。目標：" + g : "。持久系の練習中";
+    return s + "。";
+  }
+  function productsText() {
+    const p = state.settings.products;
+    if (!p.length) return "";
+    const n = (v) => v == null ? "?" : v;
+    return "- 既知の値（利用者がよく食べる市販品）: " + p.map((x) => x.name + (x.amount ? " " + x.amount : "") + "=" + n(x.kcal) + "kcal P" + n(x.protein) + " F" + n(x.fat) + " C" + n(x.carbs)).join(" / ");
+  }
+  function promptFor(kubun, date, memo, hasImages) {
+    return [
+      "あなたはスポーツ栄養に詳しい管理栄養士です。" + (hasImages ? "添付の食事写真と" : "") + "メモから、1回の食事の栄養を推定してください。",
+      "基準は日本食品標準成分表（八訂）と市販品の栄養成分表示。" + profileText(),
+      "",
+      "ルール:",
+      "- メモに書かれた量（g・個数・品名）は写真より優先する。メモで写真の品目を訂正されたらメモに従う",
+      "- 量や中身が分からないものは写真から推定し、何を想定したかを items の note に短く書く（例：約70gと想定）",
+      productsText() || null,
+      "- ナッツは成分表の値から約15%差し引く（アーモンド単体なら20%）。実際に吸収されるエネルギーが少ないため。noteにその旨を書く",
+      "- 確度: 品目と量がはっきりしていれば「高」、写真から量を推定したら「中」、外食などで中身や量がよく分からなければ「低」",
+      "- content はスプレッドシートの1行に入る説明。品目と量を「、」でつなぐ（例：ご飯130g、納豆1パック、味噌汁（豆腐・わかめ））",
+      "- comment は、この食事についての具体的な一言（脂質が多い、糖質が足りない等）。60字以内。なければ空文字",
+      "",
+      "区分: " + kubun + " / 日付: " + date,
+      "メモ: " + (memo || "なし"),
+      "",
+      'JSONだけで返答: {"content": string, "items": [{"name": string, "kcal": number, "protein": number, "fat": number, "carbs": number, "note": string}], "confidence": "高"|"中"|"低", "comment": string}',
+    ].filter((l) => l != null).join("\n");
+  }
+
+  function fillEstimate(est) {
+    const items = Array.isArray(est.items) ? est.items : [];
+    lastItems = items.map((it) => ({ name: String(it.name || ""), kcal: toNum(it.kcal), protein: toNum(it.protein), fat: toNum(it.fat), carbs: toNum(it.carbs), note: String(it.note || "") }));
+    const t = lastItems.reduce((a, it) => ({ k: a.k + it.kcal, p: a.p + it.protein, f: a.f + it.fat, c: a.c + it.carbs }), { k: 0, p: 0, f: 0, c: 0 });
+    $("eContent").value = String(est.content || lastItems.map((i) => i.name).join("、"));
+    $("eKcal").value = Math.round(t.k);
+    $("eP").value = Math.round(t.p * 10) / 10;
+    $("eF").value = Math.round(t.f * 10) / 10;
+    $("eC").value = Math.round(t.c * 10) / 10;
+    $("eConf").value = ["高", "中", "低"].includes(est.confidence) ? est.confidence : "中";
+    $("estItemsWrap").innerHTML = lastItems.length ? '<table><thead><tr><th>品目</th><th>kcal</th><th>P</th><th>F</th><th>C</th></tr></thead><tbody>' +
+      lastItems.map((it) => '<tr><td>' + esc(it.name) + (it.note ? '<span class="note">' + esc(it.note) + '</span>' : '') + '</td><td>' + fmt(it.kcal) + '</td><td>' + fmt1(it.protein) + '</td><td>' + fmt1(it.fat) + '</td><td>' + fmt1(it.carbs) + '</td></tr>').join("") +
+      '<tr><td><strong>合計</strong></td><td><strong>' + fmt(t.k) + '</strong></td><td>' + fmt1(t.p) + '</td><td>' + fmt1(t.f) + '</td><td>' + fmt1(t.c) + '</td></tr></tbody></table>' : "";
+    const cm = String(est.comment || "").trim();
+    $("estComment").hidden = !cm; $("estComment").textContent = cm;
+    $("est").hidden = false;
+    $("saveStatus").textContent = "";
+  }
+
+  function sampleCopy(e) {
+    switch (e && e.code) {
+      case "not_granted": case "sampling_disabled": case "not_declared": case "capability_disabled": case "capability_removed": return "このビューではClaudeの推定を使えません。手入力で記録できます。";
+      case "rate_limited": return "使用量の上限に達しました。少し時間をおいてからもう一度押してください。";
+      case "image_rejected": return "この写真は読み込めませんでした。別の写真にするか、枚数を減らしてください。";
+      case "images_unavailable": return "このビューでは写真を送れません。メモだけで推定するか、手入力してください。";
+      case "invalid_json": return "推定結果をうまく読み取れませんでした。もう一度押してください。";
+      case "refused": return "この内容は推定できませんでした。メモを変えて試してください。";
+      case "session_expired": return "claude.aiに再度サインインしてください。";
+      case "cancelled": return "止めました。";
+      default: return "推定できませんでした。もう一度押してください。";
+    }
+  }
+
+  $("btnEstimate").onclick = async () => {
+    const memo = $("fMemo").value.trim();
+    if (!state.sample) { $("estStatus").textContent = "このビューではClaudeの推定を使えません。「手入力する」から記録できます。"; return; }
+    if (!state.files.length && !memo) { $("estStatus").textContent = "写真かメモのどちらかを入れてください。"; return; }
+    const useImages = state.canImages && state.files.length > 0;
+    ctl = new AbortController();
+    $("btnEstimate").disabled = true; $("btnStop").hidden = false;
+    $("estStatus").textContent = "Claudeが推定しています…（写真ありだと30秒ほど）";
+    try {
+      const opts = { signal: ctl.signal, cache: false };
+      if (useImages) opts.images = state.files.slice();
+      const est = await state.sample.json(promptFor($("fKubun").value, $("fDate").value || state.date, memo, useImages), opts);
+      fillEstimate(est || {});
+      $("estStatus").textContent = "内容を確認して、必要なら数字を直してから記録してください。";
+    } catch (e) {
+      $("estStatus").textContent = sampleCopy(e);
+    } finally {
+      $("btnEstimate").disabled = false; $("btnStop").hidden = true; ctl = null;
+    }
+  };
+  $("btnStop").onclick = () => { if (ctl) ctl.abort(); };
+  $("btnManual").onclick = () => { fillEstimate({ content: $("fMemo").value.trim(), items: [], confidence: "中" }); $("eKcal").value = ""; $("eP").value = ""; $("eF").value = ""; $("eC").value = ""; $("eContent").focus(); };
+  $("btnDiscard").onclick = () => { $("est").hidden = true; lastItems = []; $("estStatus").textContent = ""; };
+
+  let saving = false;
+  $("btnSave").onclick = async () => {
+    if (saving) return;
+    const content = $("eContent").value.trim();
+    const date = $("fDate").value || state.date;
+    if (!content) { $("saveStatus").textContent = "内容を入れてください。"; return; }
+    if ($("eKcal").value === "") { $("saveStatus").textContent = "kcalを入れてください。"; return; }
+    if (!state.mcp || !CONFIGURED) { $("saveStatus").textContent = "このビューではスプレッドシートに書き込めません。"; return; }
+    const row = [date, $("fKubun").value, content, toNum($("eKcal").value), toNum($("eP").value), toNum($("eF").value), toNum($("eC").value), $("eConf").value];
+    saving = true; $("btnSave").disabled = true; $("saveStatus").textContent = "書き込んでいます…";
+    try {
+      await state.mcp.callTool(SHEETS, "append_values", { spreadsheetId: SPREADSHEET_ID, range: "食事ログ!A1", values: [row] }, { cache: false });
+      $("saveStatus").textContent = "記録しました。";
+      $("est").hidden = true; $("fMemo").value = ""; state.files = []; renderThumbs(); $("estStatus").textContent = "";
+      if (date !== state.date) setDate(date);
+      await loadMeals(); renderAll();
+    } catch (e) {
+      // An ambiguous failure may have written the row: reload and let the person decide, never resend automatically.
+      const ambiguous = e && (e.code === "server_unavailable" || e.code === "upstream_error" || e.code === "cancelled");
+      $("saveStatus").textContent = ambiguous
+        ? "書き込めたか確認できませんでした。食事ログを再読み込みして、記録がなければもう一度押してください。"
+        : mcpCopy(e, SHEETS);
+      if (ambiguous) { await loadMeals(); renderAll(); }
+    } finally {
+      saving = false; $("btnSave").disabled = false;
+    }
+  };
+
+  // ---------- boot ----------
+  $("datePick").value = state.date;
+  $("fDate").value = state.date;
+  $("sheetLink").href = CONFIGURED ? "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID + "/edit" : "https://github.com/hirokitnk/fuel-ledger#セットアップ";
+  const hour = new Date().getHours();
+  $("fKubun").value = hour < 10 ? "朝" : hour < 15 ? "昼" : hour < 17 ? "間食" : "夕";
+  renderAll();
+
+  if (!CONFIGURED) {
+    showStatus($("pageStatus"), "スプレッドシートが設定されていません。セットアップ用スキルで公開するか、ファイル先頭の SPREADSHEET_ID を自分のシートのIDに置き換えてください。", true);
+  }
+  if (window.claude && typeof window.claude.use === "function") {
+    window.claude.use("sample").then(async (s) => {
+      state.sample = s;
+      if (!s) { $("btnEstimate").disabled = true; $("estStatus").textContent = "このビューではClaudeの推定を使えません。「手入力する」から記録できます。"; return; }
+      const lim = await s.limits().catch(() => null);
+      state.canImages = !!(lim && lim.images);
+      if (!state.canImages) $("photoLabel").textContent = "このビューでは写真を送れません。メモだけで推定できます。";
+      else $("fPhotos").accept = lim.images.mediaTypes.join(",");
+    });
+    window.claude.use("mcp").then((m) => {
+      state.mcp = m;
+      if (!m) { showStatus($("pageStatus"), "このビューではスプレッドシートとStravaにつながりません。claude.aiでこのページを開いてください。", true); renderAll(); return; }
+      refreshAll();
+    });
+  } else {
+    if (CONFIGURED) showStatus($("pageStatus"), "このページはclaude.aiで開くと、スプレッドシートとStravaにつながります。", true);
+    $("btnEstimate").disabled = true;
+  }
+})();
+</script>
